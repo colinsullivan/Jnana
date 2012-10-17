@@ -1,8 +1,21 @@
+/**
+ *  @file       CSMarkovTableTests.js 
+ *
+ *              Tests for the CSMarkovTable collection of classes
+ *
+ *  @author     Colin Sullivan <colinsul [at] gmail.com>
+ *
+ *              Copyright (c) 2012 Colin Sullivan
+ *              Licensed under the MIT license.
+ **/
+
+
+
 /*global it, describe*/
 
 
 var assert = require("assert"),
-  CSMarkovTable = require("../src/CSMarkovTable.js").CSMarkovTable;
+  CSMarkovTable = require("../lib/CSMarkovTable.js").CSMarkovTable;
 
 describe("CSMarkovTable", function () {
   "use strict";
