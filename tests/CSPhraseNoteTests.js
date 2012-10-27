@@ -31,9 +31,19 @@ describe("CSPhraseNote", function () {
       });
     });
 
-    it('should return proper attributes with get method', function() {
+    it("should return proper attributes with get method", function () {
       assert.equal(note.get("al"), "pacino");
       assert.equal(note.get("chris"), "o'donnel");
+    });
+
+    it("should not calculate duration if only onTime is set", function () {
+      note.set("onTime", 5);
+      assert.equal(typeof note.attributes().duration, "undefined");
+    });
+
+    it("should only calculate duration after both ontime and offtime are set", function () {
+      note.set("offTime", 10);
+      assert.equal(typeof note.attributes().duration, "number");
     });
 
 
