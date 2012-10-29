@@ -1,13 +1,14 @@
 /*global it, describe */
 
 var assert = require("assert"),
-  CSPhraseNote = require("../lib/CSPhraseNote.js").CSPhraseNote;
+  CS = require("../lib/CS.js").CS;
+require("../lib/CSPhraseNote.js");
 
 describe("CSPhraseNote", function () {
   "use strict";
 
   describe("#set()", function () {
-    var note = new CSPhraseNote({
+    var note = new CS.PhraseNote({
       whooahh: "yes"
     });
 
