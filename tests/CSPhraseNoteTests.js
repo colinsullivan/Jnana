@@ -42,11 +42,5 @@ describe("CSPhraseNote", function () {
       assert.equal(typeof note.attributes().duration, "undefined");
     });
 
-    it("should only calculate duration after both ontime and offtime are set", function () {
-      note.set("offTime", 10);
-      assert.equal(typeof note.attributes().duration, "number");
-    });
-
-
   });
 });
