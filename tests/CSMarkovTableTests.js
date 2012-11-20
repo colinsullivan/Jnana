@@ -59,7 +59,6 @@ describe("CSMarkovTable", function () {
       assert.equal(_.keys(table._rows).length, 2);
     });
 
-
     it('should return 60 as next state', function () {
       assert.equal(table.next(), 60);
       // no new transition rules should have been added
@@ -86,31 +85,32 @@ describe("CSMarkovPhraseGenerator", function () {
   "use strict";
 
   var repetitivePhraseNotes,
-    phraseGenerator,
-    pitchTable,
-    durationTable,
     repetitivePhrase;
 
   repetitivePhraseNotes = [
     new CS.PhraseNote({
       time: 0,
       duration: 2,
-      pitch: 60
+      pitch: 60,
+      velocity: 100
     }),
     new CS.PhraseNote({
       time: 2,
       duration: 2,
-      pitch: 62
+      pitch: 62,
+      velocity: 100
     }),
     new CS.PhraseNote({
       time: 4,
       duration: 2,
-      pitch: 64
+      pitch: 64,
+      velocity: 100
     }),
     new CS.PhraseNote({
       time: 6,
       duration: 2,
-      pitch: 66
+      pitch: 66,
+      velocity: 100
     })
   ];
 
@@ -124,23 +124,32 @@ describe("CSMarkovPhraseGenerator", function () {
     });
   });
 
-  // prepare to generate new phrase
-  pitchTable = new CS.MarkovTable({order: 2});
-  durationTable = new CS.MarkovTable({order: 2});
-  phraseGenerator = new CS.MarkovPhraseGenerator({
-    order: 2,
-    pitchTable: pitchTable,
-    durationTable: durationTable
-  });
 
   
-  describe("incorporate and generate", function () {
+  describe("analyze phrase", function () {
+
+    var phraseGenerator,
+      pitchTable,
+      durationTable,
+      velocityTable;
+    
+    // prepare to generate new phrase
+    pitchTable = new CS.MarkovTable({order: 2});
+    durationTable = new CS.MarkovTable({order: 2});
+    velocityTable = new CS.MarkovTable({order: 2});
+    phraseGenerator = new CS.MarkovPhraseGenerator({
+      order: 2,
+      pitchTable: pitchTable,
+      durationTable: durationTable,
+      velocityTable: velocityTable
+    });
+   
+    // incorporate phrase into analysis
+    phraseGenerator.incorporate_phrase(repetitivePhrase);
 
     // check state of pitch and duration tables
     it("should have analyzed phrase correctly", function () {
 
-      phraseGenerator.incorporate_phrase(repetitivePhrase);
-      
       assert.equal(_.keys(pitchTable._rows).length, 2);
 
       assert.deepEqual(pitchTable._rows["60->62"]._probabilities, {
@@ -159,7 +168,7 @@ describe("CSMarkovPhraseGenerator", function () {
 
     });
 
-    it("should generate a new phrase", function () {
+    /*it("should generate a new phrase", function () {
       var generatedPhrase,
         generatedPhraseNotes,
         note,
@@ -172,8 +181,110 @@ describe("CSMarkovPhraseGenerator", function () {
       // found bug I was looking for while inspecting this
       //console.log("generatedPhraseNotes");
       //console.log(generatedPhraseNotes);
-
       
+    });*/
+
+  });
+  
+  describe("analyze phrase 3rd order", function () {
+    var phraseGenerator,
+      pitchTable,
+      durationTable,
+      velocityTable;
+    
+    // prepare to generate new phrase
+    pitchTable = new CS.MarkovTable({order: 3});
+    durationTable = new CS.MarkovTable({order: 3});
+    velocityTable = new CS.MarkovTable({order: 3});
+    phraseGenerator = new CS.MarkovPhraseGenerator({
+      order: 3,
+      pitchTable: pitchTable,
+      durationTable: durationTable,
+      velocityTable: velocityTable
+    });
+   
+    // incorporate phrase into analysis
+    phraseGenerator.incorporate_phrase(repetitivePhrase);
+
+    // check state of pitch and duration tables
+    it("should have analyzed phrase correctly", function () {
+
+      assert.equal(_.keys(pitchTable._rows).length, 1);
+
+      assert.deepEqual(pitchTable._rows["60->62->64"]._probabilities, {
+        "60": 0,
+        "62": 0,
+        "64": 0,
+        "66": 1
+      });
+
+    });
+
+  });
+  
+  describe("analyze phrase 3rd order circular", function () {
+    var phraseGenerator,
+      pitchTable,
+      durationTable,
+      velocityTable;
+    
+    // prepare to generate new phrase
+    pitchTable = new CS.MarkovTable({order: 3});
+    durationTable = new CS.MarkovTable({order: 3});
+    velocityTable = new CS.MarkovTable({order: 3});
+    phraseGenerator = new CS.MarkovPhraseGenerator({
+      order: 3,
+      pitchTable: pitchTable,
+      durationTable: durationTable,
+      velocityTable: velocityTable,
+      assumeCircular: true
+    });
+   
+    // incorporate phrase into analysis
+    phraseGenerator.incorporate_phrase(repetitivePhrase);
+
+    // check state of pitch and duration tables
+    it("should have analyzed phrase correctly", function () {
+
+      var transitions = _.keys(pitchTable._rows);
+
+      assert.equal(
+        transitions.length,
+        4,
+        new Error("Unexpected rows in pitchTable: " + transitions)
+      );
+
+      assert.deepEqual(pitchTable._rows["60->62->64"]._probabilities, {
+        "60": 0,
+        "62": 0,
+        "64": 0,
+        "66": 1
+      });
+
+      console.log("transitions");
+      console.log(transitions);
+      
+      assert.deepEqual(pitchTable._rows["62->64->66"]._probabilities, {
+        "60": 1,
+        "62": 0,
+        "64": 0,
+        "66": 0
+      });
+      
+      assert.deepEqual(pitchTable._rows["64->66->60"]._probabilities, {
+        "60": 0,
+        "62": 1,
+        "64": 0,
+        "66": 0
+      });
+
+      assert.deepEqual(pitchTable._rows["66->60->62"]._probabilities, {
+        "60": 0,
+        "62": 0,
+        "64": 1,
+        "66": 0
+      });
+
     });
 
   });
