@@ -173,21 +173,7 @@ describe("CSMarkovPhraseGenerator", function () {
 
     });
 
-    /*it("should generate a new phrase", function () {
-      var generatedPhrase,
-        generatedPhraseNotes,
-        note,
-        i;
 
-      // generate a phrase that is 8 time-units long
-      generatedPhrase = phraseGenerator.generate_phrase(8);
-      generatedPhraseNotes = generatedPhrase.get_notes_with_rests();
-
-      // found bug I was looking for while inspecting this
-      //console.log("generatedPhraseNotes");
-      //console.log(generatedPhraseNotes);
-      
-    });*/
 
   });
   
@@ -223,6 +209,23 @@ describe("CSMarkovPhraseGenerator", function () {
         "66": 1
       });
 
+    });
+
+    it("should have analyzed initial states correctly", function () {
+      assert.equal(_.keys(pitchTable._startingStates._probabilities).length, 1);
+
+      assert.deepEqual(pitchTable._startingStates._probabilities["60->62->64"], 1.0);
+    });
+    
+    it("should generate a new phrase", function () {
+      var generatedPhrase,
+        generatedPhraseNotes,
+        note,
+        i;
+
+      // generate a phrase that is 8 time-units long
+      generatedPhrase = phraseGenerator.generate_phrase(16);
+      generatedPhraseNotes = generatedPhrase.get_notes_with_rests();
     });
 
   });
@@ -288,9 +291,173 @@ describe("CSMarkovPhraseGenerator", function () {
       });
 
     });
+    
+    it("should have analyzed initial states correctly", function () {
+      assert.equal(_.keys(pitchTable._startingStates._probabilities).length, 1);
+
+      assert.deepEqual(pitchTable._startingStates._probabilities["60->62->64"], 1.0);
+    });
+    
+    it("should generate a new phrase", function () {
+      var generatedPhrase,
+        generatedPhraseNotes,
+        note,
+        i;
+
+      // generate a phrase that is 8 time-units long
+      generatedPhrase = phraseGenerator.generate_phrase(16);
+      generatedPhraseNotes = generatedPhrase.get_notes_with_rests();
+    });
+
+  });
+  
+  describe("analysis of multiple phrases", function () {
+
+    var phraseGenerator,
+      pitchTable,
+      durationTable,
+      velocityTable,
+      anotherPhraseNotes,
+      anotherPhrase;
+    
+    // prepare to generate new phrase
+    pitchTable = new CS.MarkovTable({order: 2});
+    durationTable = new CS.MarkovTable({order: 2});
+    velocityTable = new CS.MarkovTable({order: 2});
+    phraseGenerator = new CS.MarkovPhraseGenerator({
+      order: 2,
+      pitchTable: pitchTable,
+      durationTable: durationTable,
+      velocityTable: velocityTable
+    });
+   
+    // incorporate phrase into analysis
+    phraseGenerator.incorporate_phrase(repetitivePhrase);
+    
+    anotherPhraseNotes = [
+      new CS.PhraseNote({
+        time: 0,
+        duration: 2,
+        pitch: 62,
+        velocity: 100
+      }),
+      new CS.PhraseNote({
+        time: 2,
+        duration: 2,
+        pitch: 64,
+        velocity: 100
+      }),
+      new CS.PhraseNote({
+        time: 4,
+        duration: 2,
+        pitch: 66,
+        velocity: 100
+      }),
+      new CS.PhraseNote({
+        time: 6,
+        duration: 2,
+        pitch: 68,
+        velocity: 100
+      })
+    ];
+
+    anotherPhrase = new CS.Phrase({
+      notes: anotherPhraseNotes
+    });
+
+    phraseGenerator.incorporate_phrase(anotherPhrase);
+
+    // check state of pitch and duration tables
+    it("should have analyzed phrase correctly", function () {
+
+      assert.equal(_.keys(pitchTable._rows).length, 3);
+
+      assert.deepEqual(pitchTable._rows["60->62"]._probabilities, {
+        "60": 0,
+        "62": 0,
+        "64": 1,
+        "66": 0,
+        "68": 0
+      });
+      
+      assert.deepEqual(pitchTable._rows["62->64"]._probabilities, {
+        "60": 0,
+        "62": 0,
+        "64": 0,
+        "66": 1,
+        "68": 0
+      });
+      
+      assert.deepEqual(pitchTable._rows["64->66"]._probabilities, {
+        "60": 0,
+        "62": 0,
+        "64": 0,
+        "66": 0,
+        "68": 1
+      });
+
+    });
+
+    it("should have analyzed starting probability correctly", function () {
+      assert.equal(_.keys(pitchTable._startingStates._probabilities).length, 2);
+
+      assert.equal(pitchTable._startingStates._probabilities["60->62"], 0.5);
+      assert.equal(pitchTable._startingStates._probabilities["62->64"], 0.5);
+
+    });
+    
+    it("should generate a new phrase", function () {
+      var generatedPhrase,
+        generatedPhraseNotes,
+        note,
+        i;
+
+      // generate a phrase that is 8 time-units long
+      generatedPhrase = phraseGenerator.generate_phrase(16);
+      generatedPhraseNotes = generatedPhrase.get_notes_with_rests();
+    });
 
   });
 
+  describe("generating phrase", function() {
+    var phraseGenerator,
+      pitchTable,
+      durationTable,
+      velocityTable,
+      generatedPhrase,
+      generatedPhraseNotes,
+      phrasePitches;
+    
+    // prepare to generate new phrase
+    pitchTable = new CS.MarkovTable({order: 2});
+    durationTable = new CS.MarkovTable({order: 2});
+    velocityTable = new CS.MarkovTable({order: 2});
+    phraseGenerator = new CS.MarkovPhraseGenerator({
+      order: 2,
+      pitchTable: pitchTable,
+      durationTable: durationTable,
+      velocityTable: velocityTable
+    });
+   
+    // incorporate phrase into analysis
+    phraseGenerator.incorporate_phrase(repetitivePhrase);
+
+    // generate a phrase that is 8 time-units long
+    generatedPhrase = phraseGenerator.generate_phrase(16);
+    generatedPhraseNotes = generatedPhrase.get_notes_with_rests();
+    phrasePitches = _.pluck(
+      _.invoke(generatedPhraseNotes, "attributes"),
+      "pitch"
+    );
+    
+    it("should generate proper notes", function () {
+      // initial notes can only be one thing because input is so simple
+      assert.equal(phrasePitches[0], 60);
+      assert.equal(phrasePitches[1], 62);
+      assert.equal(phrasePitches[2], 64);
+    });
+    
+  });
 
 });
 
