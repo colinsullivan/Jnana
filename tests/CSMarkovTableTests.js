@@ -123,8 +123,6 @@ describe("CSMarkovPhraseGenerator", function () {
       assert.equal(repetitivePhrase.duration, 8, new Error("Phrase did not have proper duration."));
     });
   });
-
-
   
   describe("analyze phrase", function () {
 
@@ -165,6 +163,14 @@ describe("CSMarkovPhraseGenerator", function () {
         "64": 0,
         "66": 1
       });
+
+    });
+
+    it("should have analyzed starting probability correctly", function () {
+      assert.equal(_.keys(pitchTable._startingStateProbabilities).length, 2);
+
+      assert.equal(pitchTable._startingStateProbabilities["60->62"], 1.0);
+      assert.equal(pitchTable._startingStateProbabilities["62->64"], 0.0);
 
     });
 
@@ -261,9 +267,6 @@ describe("CSMarkovPhraseGenerator", function () {
         "66": 1
       });
 
-      console.log("transitions");
-      console.log(transitions);
-      
       assert.deepEqual(pitchTable._rows["62->64->66"]._probabilities, {
         "60": 1,
         "62": 0,
@@ -288,6 +291,7 @@ describe("CSMarkovPhraseGenerator", function () {
     });
 
   });
+
 
 });
 
