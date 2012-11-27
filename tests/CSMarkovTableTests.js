@@ -167,10 +167,9 @@ describe("CSMarkovPhraseGenerator", function () {
     });
 
     it("should have analyzed starting probability correctly", function () {
-      assert.equal(_.keys(pitchTable._startingStateProbabilities).length, 2);
+      assert.equal(_.keys(pitchTable._startingStates._probabilities).length, 1);
 
-      assert.equal(pitchTable._startingStateProbabilities["60->62"], 1.0);
-      assert.equal(pitchTable._startingStateProbabilities["62->64"], 0.0);
+      assert.equal(pitchTable._startingStates._probabilities["60->62"], 1.0);
 
     });
 
