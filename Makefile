@@ -13,6 +13,7 @@ all: ./build/CS.js
 	cat ./lib/CSHelpers.js >> ./build/CS.js
 	cat ./lib/CSInputAnalyzer.js >> ./build/CS.js
 	cat ./lib/CSAbletonInputAnalyzer.js >> ./build/CS.js
+	cat ./lib/CSPhraseAnalyzer.js >> ./build/CS.js
 	cat ./lib/CSMarkovPhraseGenerator.js >> ./build/CS.js
 	cat ./lib/CSMarkovStateMachine.js >> ./build/CS.js
 	cat ./lib/CSMarkovMultiStateMachine.js >> ./build/CS.js

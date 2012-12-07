@@ -216,16 +216,8 @@
     }
     clip = this._clip = params.clip;
 
-    if (typeof params.pitchTable === "undefined" || params.pitchTable === null) {
-      throw new Error("params.pitchTable is undefined");
-    }
-
-    if (typeof params.durationTable === "undefined" || params.durationTable === null) {
-      throw new Error("params.durationTable is undefined");
-    }
-
-    if (typeof params.velocityTable === "undefined" || params.velocityTable === null) {
-      throw new Error("params.velocityTable is undefined");
+    if (typeof params.phraseAnalyzer === "undefined" || params.phraseAnalyzer === null) {
+      throw new Error("params.phraseAnalyzer is undefined");
     }
 
     if (typeof params.assumeCircular === "undefined" || params.assumeCircular === null) {
@@ -233,10 +225,7 @@
     }
     
     this._phraseGenerator = new CS.MarkovPhraseGenerator({
-      order: 2,
-      pitchTable: params.pitchTable,
-      durationTable: params.durationTable,
-      velocityTable: params.velocityTable,
+      phraseAnalyzer: params.phraseAnalyzer,
       assumeCircular: params.assumeCircular
     });
 
@@ -1115,14 +1104,13 @@ if (typeof exports !== "undefined" && exports !== null) {
      *  generating continuously on demand.
      **/
     this.genClips = [];
-   
-    /**
-     *  Markov tables to store statistics of incoming input.
-     **/
-    this.pitchTable = new CS.MarkovTable({order: 3});
-    this.durationTable = new CS.MarkovTable({order: 3});
-    this.velocityTable = new CS.MarkovTable({order: 3});
 
+    /**
+     *  Phrase analyzer to store statistics of incoming input.
+     **/
+    this.phraseAnalyzer = new CS.PhraseAnalyzer({
+      markovOrder: 3
+    });
 
     /**
      *  Grab clips from session that will be used to populate with 
@@ -1145,18 +1133,15 @@ if (typeof exports !== "undefined" && exports !== null) {
         if (clipName.match(/-manual[\d]*$/)) {
           this.genClips.push(new CS.Ableton.SelfGeneratingClip({
             playsTillAutoGenerate: 1,
-            pitchTable: this.pitchTable,
-            durationTable: this.durationTable,
-            velocityTable: this.velocityTable,
+            phraseAnalyzer: this.phraseAnalyzer,
             clip: clip
           }));
+        // and do the same for all clips named "something-auto"
         } else if (clipName.match(/-auto$/)) {
           this.autoGenClip = new CS.Ableton.SelfGeneratingClip({
+            playsTillAutoGenerate: -1, // doesn't matter because it wont auto generate because loop should be off
             clip: clip,
-            playsTillAutoGenerate: -1, // doesn't matter because it wont auto generate
-            pitchTable: this.pitchTable,
-            durationTable: this.durationTable,
-            velocityTable: this.velocityTable
+            phraseAnalyzer: this.phraseAnalyzer
           });
         }
       
@@ -1186,9 +1171,13 @@ if (typeof exports !== "undefined" && exports !== null) {
       autoGenClip = this.autoGenClip,
       me = this;
 
-    autoGenClip._phraseGenerator.incorporate_phrase(phrase);
+    this.phraseAnalyzer.incorporate_phrase(phrase);
 
     roundedPhraseDuration = Math.ceil(phrase.duration);
+
+    post("roundedPhraseDuration:\n");
+    post(roundedPhraseDuration);
+    post("\n");
 
     /**
      *  If we are in auto response mode, and a phrase just ended,
@@ -1270,9 +1259,7 @@ if (typeof exports !== "undefined" && exports !== null) {
 
   CS.Ableton.InputAnalyzer.prototype.clear_training = function () {
 
-    this.pitchTable.clear();
-    this.durationTable.clear();
-    this.velocityTable.clear();
+    this.phraseAnalyzer.clear_analysis();
     
   };
 
@@ -1283,9 +1270,248 @@ if (typeof exports !== "undefined" && exports !== null) {
     for (i = 0; i < this.genClips.length; i++) {
       this.genClips[i]._phraseGenerator.set_useInitial(value);
     }
+  };
+  
+  
+}).call(this);
+/**
+ *  @file       CSPhraseAnalyzer.js
+ *
+ *  @author     Colin Sullivan <colinsul [at] gmail.com>
+ *
+ *              Copyright (c) 2012 Colin Sullivan
+ *              Licensed under the GPLv3 license.
+ **/
+
+(function () {
+  "use strict";
+
+  var CS,
+    _,
+    root = this,
+    post;
+  if (typeof require !== "undefined" && require !== null) {
+    CS = require("./CS.js").CS;
+    require("./CSMarkovMultiStateMachine.js");
+    require("./CSMarkovTable.js");
+    root._ = require("./vendor/underscore.js")._;
+  } else {
+    CS = this.CS;
+    _ = this._;
   }
-  
-  
+
+  /**
+   *  @class    CS.PhraseAnalyzer   Maintains statistics of incoming
+   *  phrases.  Provides API for `PhraseGenerator` instances to grab
+   *  statistics they need to generate new phrases.
+   **/
+  CS.PhraseAnalyzer = function (params) {
+    var markovParams;
+
+
+    if (typeof params === "undefined" || params === null) {
+      params = {};
+    }
+
+    if (typeof params.markovOrder === "undefined" || params.markovOrder === null) {
+      params.markovOrder = 3;
+    }
+    this._markovOrder = params.markovOrder;
+
+    markovParams = {order: this._markovOrder};
+
+    /**
+     *  Markov tables to store statistics of incoming input.
+     **/
+    this._pitchTable              = new CS.MarkovTable(markovParams);
+    this._durationTable           = new CS.MarkovTable(markovParams);
+    this._velocityTable           = new CS.MarkovTable(markovParams);
+
+    /**
+     *  Markov tables to store statistics of incoming input in a 
+     *  circular fashion.
+     **/
+    this._circularPitchTable      = new CS.MarkovTable(markovParams);
+    this._circularDurationTable   = new CS.MarkovTable(markovParams);
+    this._circularVelocityTable   = new CS.MarkovTable(markovParams);
+
+  };
+
+  /**
+   *  Incorporate an input phrase into the current analysis.
+   *
+   *  @param  CS.Phrase  phrase   The phrase to incorporate.
+   **/
+  CS.PhraseAnalyzer.prototype.incorporate_phrase = function (phrase) {
+    var phraseNotesWithRests,
+      phraseNotesWithRestsData,
+      order = this._markovOrder,
+      phraseNotes,
+      phraseNotesData,
+      phrasePitches,
+      phraseDurations,
+      phraseVelocities,
+      startStateIndex,
+      endStateIndexPlusOne,
+      pitchTable = this._pitchTable,
+      durationTable = this._durationTable,
+      velocityTable = this._velocityTable,
+      circularPitchTable = this._circularPitchTable,
+      circularDurationTable = this._circularDurationTable,
+      circularVelocityTable = this._circularVelocityTable,
+      i,
+      wrapIndex,
+      _ = root._;
+
+    phraseNotes = phrase.get_notes();
+    phraseNotesWithRests = phrase.get_notes_with_rests();
+
+    // convert note class to key-value data of attributes
+    phraseNotesWithRestsData = _.invoke(phraseNotesWithRests, "attributes");
+    phraseNotesData = _.invoke(phraseNotes, "attributes");
+
+    // and grab array of pitches and durations since we'll need those
+    phrasePitches = _.pluck(phraseNotesWithRestsData, "pitch");
+    phraseDurations = _.pluck(phraseNotesWithRestsData, "duration");
+
+    // don't care about the velocity of rests because it is inherently
+    // encoded in the pitches and durations of the rest notes generated,
+    // therefore we don't include rests in analysis of velocity attributes.
+    phraseVelocities = _.pluck(phraseNotesData, "velocity");
+
+    // Analyze every N + 1 note sequence, where N is the order of the 
+    // system.  For example, if order == 2 this will grab every
+    // 3 notes to incorporate the two previous states and one future
+    // state into analysis.  This will leave out notes at end of
+    // phrase that will not fit into an N + 1 sequence.
+    
+    // first, incorporate initial N notes.
+    pitchTable.add_initial_transition(
+      phrasePitches.slice(0, order + 1)
+    );
+    
+    durationTable.add_initial_transition(
+      phraseDurations.slice(0, order + 1)
+    );
+
+    circularPitchTable.add_initial_transition(
+      phrasePitches.slice(0, order + 1)
+    );
+
+    circularDurationTable.add_initial_transition(
+      phraseDurations.slice(0, order + 1)
+    );
+
+    for (i = order + 1; i < phraseNotesWithRestsData.length; i++) {
+      startStateIndex = i - order;
+      endStateIndexPlusOne = i + 1;
+
+      // extract pitch attributes
+      pitchTable.add_transition(
+        phrasePitches.slice(startStateIndex, endStateIndexPlusOne)
+      );
+      circularPitchTable.add_transition(
+        phrasePitches.slice(startStateIndex, endStateIndexPlusOne)
+      );
+
+      durationTable.add_transition(
+        phraseDurations.slice(startStateIndex, endStateIndexPlusOne)
+      );
+      circularDurationTable.add_transition(
+        phraseDurations.slice(startStateIndex, endStateIndexPlusOne)
+      );
+    }
+
+    // if we want to consider phrases to be circular, we need to additionally
+    // incorporate sequences where the starting note is up to the last note in 
+    // the phrase.
+    
+    // starting at next `startStateIndex` and going until the 
+    // last note in the phrase, analyze each N + 1 note sequence just
+    // as before, but now wrap around
+    for (startStateIndex = i - order; startStateIndex < phraseNotesWithRestsData.length; startStateIndex++) {
+     
+      // endStateIndex is probably the last note in the phrase.
+      endStateIndexPlusOne = Math.min(startStateIndex + order + 1, phraseNotesWithRestsData.length + 1);
+      // this is the note from the beginning of the phrase that we've
+      // wrapped around to in order to get our Nth order transition.
+      wrapIndex = order + 1 - (endStateIndexPlusOne - startStateIndex) + 1;
+
+      // ex:
+      //    
+      //    phraseNotes = [60, 62, 64, 66];
+      //    order = 3;
+      //    startStateIndex = 1; (pointing to 62)
+      //    endStateIndexPlusOne = 3; (pointing to 66)
+      //    wrapIndex = 1; (pointing to 60)
+      //    
+      // yields the trasition:
+      //
+      //    62->64->66 -> 60
+      //
+      // then on the next loop iteration:
+      //
+      //    startStateIndex = 2; (pointing to 64)
+      //    endStateIndexPlusOne = 4; (pointing to nil)
+      //    wrapIndex = 2; (pointing to 62)
+      //
+      // yields the transition:
+      //
+      //    64->66->60 -> 62
+      //
+      
+      circularPitchTable.add_transition(
+        phrasePitches
+          .slice(startStateIndex, endStateIndexPlusOne)
+          .concat(phrasePitches.slice(0, wrapIndex))
+      );
+
+      circularDurationTable.add_transition(
+        phraseDurations
+          .slice(startStateIndex, endStateIndexPlusOne)
+          .concat(phraseDurations.slice(0, wrapIndex))
+      
+      );
+    }
+
+    // now do same as above for attributes that do not care about rests
+    velocityTable.add_initial_transition(
+      phraseVelocities.slice(0, order + 1)
+    );
+    circularVelocityTable.add_initial_transition(
+      phraseVelocities.slice(0, order + 1)
+    );
+    for (i = order + 1; i < phraseNotesData.length; i++) {
+      startStateIndex = i - order;
+      endStateIndexPlusOne = i + 1;
+
+      velocityTable.add_transition(
+        phraseVelocities.slice(startStateIndex, endStateIndexPlusOne)
+      );
+      circularVelocityTable.add_transition(
+        phraseVelocities.slice(startStateIndex, endStateIndexPlusOne)
+      );
+    }
+    
+    for (startStateIndex = i - order; startStateIndex < phraseNotesData.length; startStateIndex++) {
+      endStateIndexPlusOne = Math.min(startStateIndex + order + 1, phraseNotesData.length + 1);
+      wrapIndex = order + 1 - (endStateIndexPlusOne - startStateIndex) + 1;
+
+      circularVelocityTable.add_transition(
+        phraseVelocities
+          .slice(startStateIndex, endStateIndexPlusOne)
+          .concat(phraseVelocities.slice(0, wrapIndex))
+      );
+    }
+
+    /*var keys = root._.keys(pitchTable._startingStates._probabilities);
+    post("Starting probabilities:\n");
+    for (i = 0; i < keys.length; i++) {
+      post(keys[i] + ": " + pitchTable._startingStates._probabilities[keys[i]] + "\n");
+    }
+    post("\n\n");*/
+  };
+
 }).call(this);
 /**
  *  @file       CSMarkovPhraseGenerator.js
@@ -1321,31 +1547,15 @@ if (typeof exports !== "undefined" && exports !== null) {
       params = {};
     }
 
-    if (typeof params.order === "undefined" || params.order === null) {
-      throw new Error("params.order is undefined");
+    if (typeof params.phraseAnalyzer === "undefined" || params.phraseAnalyzer === null) {
+      throw new Error("params.phraseAnalyzer is undefined");
     }
-    this._order = params.order;
-
-
-    if (typeof params.pitchTable === "undefined" || params.pitchTable === null) {
-      throw new Error("params.pitchTable is undefined");
-    }
-    this._pitchTable = params.pitchTable;
-
-    if (typeof params.durationTable === "undefined" || params.durationTable === null) {
-      throw new Error("params.durationTable is undefined");
-    }
-    this._durationTable = params.durationTable;
-
-    if (typeof params.velocityTable === "undefined" || params.velocityTable === null) {
-      throw new Error("params.velocityTable is undefined");
-    }
-    this._velocityTable = params.velocityTable;
+    this._phraseAnalyzer = params.phraseAnalyzer;
     
     this._stateMachine = new CS.MarkovMultiStateMachine({});
-    this._stateMachine.add_table("pitch", this._pitchTable);
-    this._stateMachine.add_table("duration", this._durationTable);
-    this._stateMachine.add_table("velocity", this._velocityTable);
+    this._stateMachine.add_table("pitch", this._phraseAnalyzer._pitchTable);
+    this._stateMachine.add_table("duration", this._phraseAnalyzer._durationTable);
+    this._stateMachine.add_table("velocity", this._phraseAnalyzer._velocityTable);
 
     // if we're currently generating, don't disrupt.
     this._isGenerating = false;
@@ -1354,7 +1564,9 @@ if (typeof exports !== "undefined" && exports !== null) {
       params.assumeCircular = false;
     }
     // if we should assume the input phrases are circular (useful for loops)
-    this._assumeCircular = params.assumeCircular;
+    this._assumeCircular = null;
+
+    this.set_assumeCircular(params.assumeCircular);
 
     if (typeof params.useInitialNotes === "undefined" || params.useInitialNotes === null) {
       params.useInitialNotes = false;
@@ -1370,171 +1582,25 @@ if (typeof exports !== "undefined" && exports !== null) {
   CS.MarkovPhraseGenerator.prototype = {
 
     set_assumeCircular: function (shouldAssumeCircular) {
-      this._assumeCircular = shouldAssumeCircular;
+
+      if (this._assumeCircular !== shouldAssumeCircular) {
+        this._assumeCircular = shouldAssumeCircular;
+
+        if (shouldAssumeCircular) {
+          this._stateMachine.switch_table("pitch", this._phraseAnalyzer._circularPitchTable);
+          this._stateMachine.switch_table("duration", this._phraseAnalyzer._circularDurationTable);
+          this._stateMachine.switch_table("velocity", this._phraseAnalyzer._circularVelocityTable);
+        } else {
+          this._stateMachine.switch_table("pitch", this._phraseAnalyzer._pitchTable);
+          this._stateMachine.switch_table("duration", this._phraseAnalyzer._durationTable);
+          this._stateMachine.switch_table("velocity", this._phraseAnalyzer._velocityTable);
+        }
+        
+      }
     },
 
     set_useInitial: function (shouldUseInitial) {
       this._useInitial = shouldUseInitial;
-    },
-
-
-    /**
-     *  Incorporate an input phrase into the current analysis.
-     *
-     *  @param  CS.Phrase  phrase   The phrase to incorporate.
-     **/
-    incorporate_phrase: function (phrase) {
-
-      var phraseNotesWithRests,
-        phraseNotesWithRestsData,
-        order = this._order,
-        phraseNotes,
-        phraseNotesData,
-        phrasePitches,
-        phraseDurations,
-        phraseVelocities,
-        startStateIndex,
-        endStateIndexPlusOne,
-        pitchTable = this._pitchTable,
-        durationTable = this._durationTable,
-        velocityTable = this._velocityTable,
-        i,
-        wrapIndex,
-        _ = root._;
-
-      phraseNotes = phrase.get_notes();
-      phraseNotesWithRests = phrase.get_notes_with_rests();
-
-      // convert note class to key-value data of attributes
-      phraseNotesWithRestsData = _.invoke(phraseNotesWithRests, "attributes");
-      phraseNotesData = _.invoke(phraseNotes, "attributes");
-
-      // and grab array of pitches and durations since we'll need those
-      phrasePitches = _.pluck(phraseNotesWithRestsData, "pitch");
-      phraseDurations = _.pluck(phraseNotesWithRestsData, "duration");
-
-      // don't care about the velocity of rests because it is inherently
-      // encoded in the pitches and durations of the rest notes generated,
-      // therefore we don't include rests in analysis of velocity attributes.
-      phraseVelocities = _.pluck(phraseNotesData, "velocity");
-
-      // Analyze every N + 1 note sequence, where N is the order of the 
-      // system.  For example, if order == 2 this will grab every
-      // 3 notes to incorporate the two previous states and one future
-      // state into analysis.  This will leave out notes at end of
-      // phrase that will not fit into an N + 1 sequence.
-      
-      // first, incorporate initial N notes.
-      pitchTable.add_initial_transition(
-        phrasePitches.slice(0, order + 1)
-      );
-      
-      durationTable.add_initial_transition(
-        phraseDurations.slice(0, order + 1)
-      );
-
-
-      for (i = order + 1; i < phraseNotesWithRestsData.length; i++) {
-        startStateIndex = i - order;
-        endStateIndexPlusOne = i + 1;
-
-        // extract pitch attributes
-        pitchTable.add_transition(
-          phrasePitches.slice(startStateIndex, endStateIndexPlusOne)
-        );
-
-        durationTable.add_transition(
-          phraseDurations.slice(startStateIndex, endStateIndexPlusOne)
-        );
-
-      }
-
-      // if we're assuming phrases are circular, additionally incorporate
-      // sequences where the starting note is up to the last note in 
-      // the phrase.
-      if (this._assumeCircular) {
-        // starting at next `startStateIndex` and going until the 
-        // last note in the phrase, analyze each N + 1 note sequence just
-        // as before, but now wrap around
-        for (startStateIndex = i - order; startStateIndex < phraseNotesWithRestsData.length; startStateIndex++) {
-         
-          // endStateIndex is probably the last note in the phrase.
-          endStateIndexPlusOne = Math.min(startStateIndex + order + 1, phraseNotesWithRestsData.length + 1);
-          // this is the note from the beginning of the phrase that we've
-          // wrapped around to in order to get our Nth order transition.
-          wrapIndex = order + 1 - (endStateIndexPlusOne - startStateIndex) + 1;
-
-          // ex:
-          //    
-          //    phraseNotes = [60, 62, 64, 66];
-          //    order = 3;
-          //    startStateIndex = 1; (pointing to 62)
-          //    endStateIndexPlusOne = 3; (pointing to 66)
-          //    wrapIndex = 1; (pointing to 60)
-          //    
-          // yields the trasition:
-          //
-          //    62->64->66 -> 60
-          //
-          // then on the next loop iteration:
-          //
-          //    startStateIndex = 2; (pointing to 64)
-          //    endStateIndexPlusOne = 4; (pointing to nil)
-          //    wrapIndex = 2; (pointing to 62)
-          //
-          // yields the transition:
-          //
-          //    64->66->60 -> 62
-          //
-          
-          pitchTable.add_transition(
-            phrasePitches
-              .slice(startStateIndex, endStateIndexPlusOne)
-              .concat(phrasePitches.slice(0, wrapIndex))
-          );
-
-          durationTable.add_transition(
-            phraseDurations
-              .slice(startStateIndex, endStateIndexPlusOne)
-              .concat(phraseDurations.slice(0, wrapIndex))
-          
-          );
-
-        }
-      }
-
-      // now do same as above for attributes that do not care about rests
-      velocityTable.add_initial_transition(
-        phraseVelocities.slice(0, order + 1)
-      );
-      for (i = order + 1; i < phraseNotesData.length; i++) {
-        startStateIndex = i - order;
-        endStateIndexPlusOne = i + 1;
-
-        velocityTable.add_transition(
-          phraseVelocities.slice(startStateIndex, endStateIndexPlusOne)
-        );
-      }
-      if (this._assumeCircular) {
-        for (startStateIndex = i - order; startStateIndex < phraseNotesData.length; startStateIndex++) {
-          endStateIndexPlusOne = Math.min(startStateIndex + order + 1, phraseNotesData.length + 1);
-          wrapIndex = order + 1 - (endStateIndexPlusOne - startStateIndex) + 1;
-
-          velocityTable.add_transition(
-            phraseVelocities
-              .slice(startStateIndex, endStateIndexPlusOne)
-              .concat(phraseVelocities.slice(0, wrapIndex))
-          );
-        }
-      }
-
-      /*var keys = root._.keys(pitchTable._startingStates._probabilities);
-      post("Starting probabilities:\n");
-      for (i = 0; i < keys.length; i++) {
-        post(keys[i] + ": " + pitchTable._startingStates._probabilities[keys[i]] + "\n");
-      }
-      post("\n\n");*/
-
     },
 
     /**
@@ -1728,10 +1794,19 @@ if (typeof exports !== "undefined" && exports !== null) {
       this._prevStates.push(nextState);
 
       return nextState;
-    }
-  
-  };
+    },
 
+    /**
+     *  Switch this state machine's table.  The new machine should have the same
+     *  states as the previous machine, or `_prevStates` should be cleared to 
+     *  avoid bad things happening.
+     *
+     *  @param  MarkovTable  newTable
+     **/
+    switch_table: function (newTable) {
+      this._table = newTable;
+    }
+  };
 
 }).call(this);
 /**
@@ -1796,6 +1871,18 @@ if (typeof exports !== "undefined" && exports !== null) {
       this._machines[propertyName] = new CS.MarkovStateMachine({
         table: propertyTable
       });
+    },
+
+    /**
+     *  Switch a state machine's `MarkovTable` reference.  This would cause
+     *  bad things to happen if the new table had some possible states removed
+     *  because state machines will keep their previous states.
+     *
+     *  @param  String        propertyName      The table key we are switching
+     *  @param  MarkovTable   newPropertyTable  Reference to new table
+     **/
+    switch_table: function (propertyName, newPropertyTable) {
+      this._machines[propertyName]
     },
    
     /**
@@ -2295,14 +2382,16 @@ if (typeof exports !== "undefined" && exports !== null) {
 (function () {
   "use strict";
 
-  var CS, root = this;
+  var CS, root = this, post;
 
   if (typeof require !== "undefined" && require !== null) {
     CS = require("./CS.js").CS;
     require("./CSPhraseNote.js");
     this._ = require("./vendor/underscore.js")._;
+    post = console.log;
   } else {
     CS = this.CS;
+    post = this.post;
   }
   
   /**
