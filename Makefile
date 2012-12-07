@@ -15,6 +15,7 @@ all: ./build/CS.js
 	cat ./lib/CSAbletonInputAnalyzer.js >> ./build/CS.js
 	cat ./lib/CSMarkovPhraseGenerator.js >> ./build/CS.js
 	cat ./lib/CSMarkovStateMachine.js >> ./build/CS.js
+	cat ./lib/CSMarkovMultiStateMachine.js >> ./build/CS.js
 	cat ./lib/CSProbabilityVector.js >> ./build/CS.js
 	cat ./lib/CSMarkovTable.js >> ./build/CS.js
 	cat ./lib/CSMarkovTableRow.js >> ./build/CS.js
