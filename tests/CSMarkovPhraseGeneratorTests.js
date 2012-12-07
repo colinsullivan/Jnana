@@ -177,7 +177,7 @@ describe("CSMarkovPhraseGenerator", function () {
     // incorporate phrase into analysis
     phraseAnalyzer.incorporate_phrase(repetitivePhrase);
 
-    // check state of pitch and duration tables
+    // check state of circular pitch tables
     it("should have analyzed phrase correctly", function () {
 
       var pitchTable = phraseAnalyzer._circularPitchTable,
@@ -215,6 +215,27 @@ describe("CSMarkovPhraseGenerator", function () {
         "62": 0,
         "64": 1,
         "66": 0
+      });
+
+    });
+    
+    // check state of non-circular pitch tables
+    it("should have analyzed non-circular phrase correctly", function () {
+
+      var pitchTable = phraseAnalyzer._pitchTable,
+        transitions = _.keys(pitchTable._rows);
+
+      assert.equal(
+        transitions.length,
+        1,
+        new Error("Unexpected rows in pitchTable: " + transitions)
+      );
+
+      assert.deepEqual(pitchTable._rows["60->62->64"]._probabilities, {
+        "60": 0,
+        "62": 0,
+        "64": 0,
+        "66": 1
       });
 
     });
@@ -359,7 +380,8 @@ describe("CSMarkovPhraseGenerator", function () {
       markovOrder: 2
     });
     phraseGenerator = new CS.MarkovPhraseGenerator({
-      phraseAnalyzer: phraseAnalyzer
+      phraseAnalyzer: phraseAnalyzer,
+      useInitialNotes: true
     });
    
     // incorporate phrase into analysis

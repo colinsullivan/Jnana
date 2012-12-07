@@ -334,36 +334,36 @@
       }
       clip.call("done");
 
-      post("moving loop markers...\n");
+      //post("moving loop markers...\n");
       if (moveEndMarker) {
         // move clip end and clip start to boundaries of newly generated clip.
-        post("\tlooping 0\n");
+        //post("\tlooping 0\n");
         clip.set("looping", 0);
-        post("\tloop_end " + tEnd.toFixed(3) + "\n");
+        //post("\tloop_end " + tEnd.toFixed(3) + "\n");
         clip.set("loop_end", tEnd.toFixed(3));
-        post("\tlooping 1\n");
+        //post("\tlooping 1\n");
         clip.set("looping", 1);
-        post("\tloop_end " + tEnd.toFixed(3) + "\n");
+        //post("\tloop_end " + tEnd.toFixed(3) + "\n");
         clip.set("loop_end", tEnd.toFixed(3));
         this._currentLoopEndTime = tEnd;
       }
      
       if (moveStartMarker) {
         // move loop start and loop end to boundaries of newly generated clip
-        post("\tlooping 0\n");
+        //post("\tlooping 0\n");
         clip.set("looping", 0);
-        post("\tloop_start " + tStart.toFixed(3) + "\n");
+        //post("\tloop_start " + tStart.toFixed(3) + "\n");
         clip.set("loop_start", tStart.toFixed(3));
-        post("\tlooping 1\n");
+        //post("\tlooping 1\n");
         clip.set("looping", 1);
-        post("\tloop_start " + tStart.toFixed(3) + "\n");
+        //post("\tloop_start " + tStart.toFixed(3) + "\n");
         clip.set("loop_start", tStart.toFixed(3));
       }
 
 
       clip.set("looping", loopingOn);
 
-      post("done moving loop markers...\n");
+      //post("done moving loop markers...\n");
       
     },
 
@@ -1175,10 +1175,6 @@ if (typeof exports !== "undefined" && exports !== null) {
 
     roundedPhraseDuration = Math.ceil(phrase.duration);
 
-    post("roundedPhraseDuration:\n");
-    post(roundedPhraseDuration);
-    post("\n");
-
     /**
      *  If we are in auto response mode, and a phrase just ended,
      *  initiate the auto response
@@ -1266,9 +1262,13 @@ if (typeof exports !== "undefined" && exports !== null) {
   CS.Ableton.InputAnalyzer.prototype.set_use_starting_statistics = function (value) {
     var i;
 
-    this.autoGenClip._phraseGenerator.set_useInitial(value);
+    post("calling set_use_initial on:\n");
+    post("this.autoGenClip._phraseGenerator:\n");
+    post(this.autoGenClip._phraseGenerator);
+    post("\n");
+    this.autoGenClip._phraseGenerator.set_use_initial(value);
     for (i = 0; i < this.genClips.length; i++) {
-      this.genClips[i]._phraseGenerator.set_useInitial(value);
+      this.genClips[i]._phraseGenerator.set_use_initial(value);
     }
   };
   
@@ -1334,6 +1334,12 @@ if (typeof exports !== "undefined" && exports !== null) {
     this._circularPitchTable      = new CS.MarkovTable(markovParams);
     this._circularDurationTable   = new CS.MarkovTable(markovParams);
     this._circularVelocityTable   = new CS.MarkovTable(markovParams);
+
+    /**
+     *  Statistics of beginning of phrase.  Basically a `MarkovTableRow` that
+     *  keeps track of which rows of the tables above have a higher
+     *  probability of being starting rows.
+     **/
 
   };
 
@@ -1526,15 +1532,17 @@ if (typeof exports !== "undefined" && exports !== null) {
 (function () {
   "use strict";
 
-  var CS, _, root = this;
+  var CS, _, root = this, post;
   if (typeof require !== "undefined" && require !== null) {
     CS = require("./CS.js").CS;
     require("./CSMarkovMultiStateMachine.js");
     require("./CSMarkovTable.js");
     root._ = require("./vendor/underscore.js")._;
+    post = console.log;
   } else {
     CS = this.CS;
     _ = this._;
+    post = this.post;
   }
 
   /**
@@ -1576,7 +1584,8 @@ if (typeof exports !== "undefined" && exports !== null) {
      *  initial notes of each phrase when choosing the initial notes of a
      *  generated phrase.
      **/
-    this._useInitial = params.useInitialNotes;
+    this._useInitial = null;
+    this.set_use_initial(params.useInitialNotes);
   };
 
   CS.MarkovPhraseGenerator.prototype = {
@@ -1599,7 +1608,7 @@ if (typeof exports !== "undefined" && exports !== null) {
       }
     },
 
-    set_useInitial: function (shouldUseInitial) {
+    set_use_initial: function (shouldUseInitial) {
       this._useInitial = shouldUseInitial;
     },
 
@@ -1616,6 +1625,10 @@ if (typeof exports !== "undefined" && exports !== null) {
       if (typeof phraseDuration === "undefined" || phraseDuration === null) {
         throw new Error("phraseDuration is undefined");
       }
+
+      post("this._useInitial:\n");
+      post(this._useInitial);
+      post("\n");
 
       var result,
         stateMachine = this._stateMachine,
@@ -1797,9 +1810,11 @@ if (typeof exports !== "undefined" && exports !== null) {
     },
 
     /**
-     *  Switch this state machine's table.  The new machine should have the same
-     *  states as the previous machine, or `_prevStates` should be cleared to 
-     *  avoid bad things happening.
+     *  Switch this state machine's table.  If the new table does not have
+     *  a path that the machine can take given its current `_prevStates`, it
+     *  will be given a random destination state when the row is created.  This
+     *  could be undesirable and thus switching tables in the middle of a
+     *  generating phrase is discouraged.
      *
      *  @param  MarkovTable  newTable
      **/
@@ -1874,15 +1889,14 @@ if (typeof exports !== "undefined" && exports !== null) {
     },
 
     /**
-     *  Switch a state machine's `MarkovTable` reference.  This would cause
-     *  bad things to happen if the new table had some possible states removed
-     *  because state machines will keep their previous states.
+     *  Switch a state machine's `MarkovTable` reference.  Useful if we want
+     *  to switch to using a circular analysis, for example.
      *
      *  @param  String        propertyName      The table key we are switching
      *  @param  MarkovTable   newPropertyTable  Reference to new table
      **/
     switch_table: function (propertyName, newPropertyTable) {
-      this._machines[propertyName]
+      this._machines[propertyName].switch_table(newPropertyTable);
     },
    
     /**
@@ -2097,7 +2111,7 @@ if (typeof exports !== "undefined" && exports !== null) {
 
 
   /**
-   *  @class  CSMarkovTable   A Markov table and state machine implementation.
+   *  @class  CSMarkovTable   A general Markov table implementation.
    **/
   CS.MarkovTable = function (params) {
     var order;

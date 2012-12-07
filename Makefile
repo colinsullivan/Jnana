@@ -29,7 +29,7 @@ clean:
 install:
 	cp ./lib/vendor/*.js ${MAX_JAVSCRIPT_DIR}
 	cp ./lib/CSAbletonMarkovAnalysisAndGenerator.js ${MAX_JAVSCRIPT_DIR}/
-	cp ./lib/CSLiveInputAnalyzer.js ${MAX_JAVSCRIPT_DIR}/
+	cp ./lib/CSJnanaLive.js ${MAX_JAVSCRIPT_DIR}/
 	cp ./build/CS.js ${MAX_JAVSCRIPT_DIR}/
 	test -d ${MAX_ABLETON_MIDI_EFFECTS_DIR}/CS\ Devices/ || mkdir ${MAX_ABLETON_MIDI_EFFECTS_DIR}/CS\ Devices/
 	cp ./ableton/* ${MAX_ABLETON_MIDI_EFFECTS_DIR}/CS\ Devices/
