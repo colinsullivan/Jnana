@@ -220,13 +220,13 @@
       throw new Error("params.phraseAnalyzer is undefined");
     }
 
-    if (typeof params.assumeCircular === "undefined" || params.assumeCircular === null) {
-      params.assumeCircular = false;
+    if (typeof params.useCircular === "undefined" || params.useCircular === null) {
+      params.useCircular = false;
     }
     
     this._phraseGenerator = new CS.MarkovPhraseGenerator({
       phraseAnalyzer: params.phraseAnalyzer,
-      assumeCircular: params.assumeCircular
+      useCircular: params.useCircular
     });
 
     /**
@@ -1262,14 +1262,20 @@ if (typeof exports !== "undefined" && exports !== null) {
   CS.Ableton.InputAnalyzer.prototype.set_use_starting_statistics = function (value) {
     var i;
 
-    post("calling set_use_initial on:\n");
-    post("this.autoGenClip._phraseGenerator:\n");
-    post(this.autoGenClip._phraseGenerator);
-    post("\n");
     this.autoGenClip._phraseGenerator.set_use_initial(value);
     for (i = 0; i < this.genClips.length; i++) {
       this.genClips[i]._phraseGenerator.set_use_initial(value);
     }
+  };
+
+  CS.Ableton.InputAnalyzer.prototype.set_use_circular_statistics = function (value) {
+    var i;
+
+    this.autoGenClip._phraseGenerator.set_use_circular(value);
+    for (i = 0; i < this.genClips.length; i++) {
+      this.genClips[i]._phraseGenerator.set_use_circular(value);
+    }
+    
   };
   
   
@@ -1568,13 +1574,13 @@ if (typeof exports !== "undefined" && exports !== null) {
     // if we're currently generating, don't disrupt.
     this._isGenerating = false;
 
-    if (typeof params.assumeCircular === "undefined" || params.assumeCircular === null) {
-      params.assumeCircular = false;
+    if (typeof params.useCircular === "undefined" || params.useCircular === null) {
+      params.useCircular = false;
     }
     // if we should assume the input phrases are circular (useful for loops)
-    this._assumeCircular = null;
+    this._useCircular = null;
 
-    this.set_assumeCircular(params.assumeCircular);
+    this.set_use_circular(params.useCircular);
 
     if (typeof params.useInitialNotes === "undefined" || params.useInitialNotes === null) {
       params.useInitialNotes = false;
@@ -1590,16 +1596,18 @@ if (typeof exports !== "undefined" && exports !== null) {
 
   CS.MarkovPhraseGenerator.prototype = {
 
-    set_assumeCircular: function (shouldAssumeCircular) {
+    set_use_circular: function (shouldUseCircular) {
 
-      if (this._assumeCircular !== shouldAssumeCircular) {
-        this._assumeCircular = shouldAssumeCircular;
+      if (this._useCircular !== shouldUseCircular) {
+        this._useCircular = shouldUseCircular;
 
-        if (shouldAssumeCircular) {
+        if (shouldUseCircular) {
+          post("using circular table\n");
           this._stateMachine.switch_table("pitch", this._phraseAnalyzer._circularPitchTable);
           this._stateMachine.switch_table("duration", this._phraseAnalyzer._circularDurationTable);
           this._stateMachine.switch_table("velocity", this._phraseAnalyzer._circularVelocityTable);
         } else {
+          post("using un-circular table\n");
           this._stateMachine.switch_table("pitch", this._phraseAnalyzer._pitchTable);
           this._stateMachine.switch_table("duration", this._phraseAnalyzer._durationTable);
           this._stateMachine.switch_table("velocity", this._phraseAnalyzer._velocityTable);
@@ -1625,10 +1633,6 @@ if (typeof exports !== "undefined" && exports !== null) {
       if (typeof phraseDuration === "undefined" || phraseDuration === null) {
         throw new Error("phraseDuration is undefined");
       }
-
-      post("this._useInitial:\n");
-      post(this._useInitial);
-      post("\n");
 
       var result,
         stateMachine = this._stateMachine,
