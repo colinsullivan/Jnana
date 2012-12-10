@@ -205,16 +205,15 @@
    *
    **/
   CS.Ableton.PhraseRenderingClip = function (params) {
-    var clip, notes, i, note, abletonClip;
+    var clip, notes, i, note;
 
     if (typeof params === "undefined" || params === null) {
       return;
     }
+
+    CS.Ableton.Clip.apply(this, arguments);
     
-    if (typeof params.clip === "undefined" || params.clip === null) {
-      throw new Error("params.clip is undefined");
-    }
-    clip = this._clip = params.clip;
+    clip = this._clip;
 
     if (typeof params.phraseAnalyzer === "undefined" || params.phraseAnalyzer === null) {
       throw new Error("params.phraseAnalyzer is undefined");
@@ -238,12 +237,9 @@
     // determine currentEndTime now the long way, but maintain for future
     // reference.  ASSUMPTION: the clip is only being modified from this
     // class instance, and nowhere else.
-    abletonClip = new CS.Ableton.Clip({
-      clip: clip
-    });
-    this._currentEndTime = abletonClip.phrase.duration;
+    this._currentEndTime = this.phrase.duration;
 
-    this._originalLoopLength = abletonClip.loopLength;
+    this._originalLoopLength = this.loopLength;
 
     /**
      *  Maintain the time of the end of the current loop for when
@@ -258,188 +254,187 @@
     
   };
 
-  CS.Ableton.PhraseRenderingClip.prototype = {
+  CS.Ableton.PhraseRenderingClip.prototype = new CS.Ableton.Clip();
 
-    /**
-     *  Inserts the notes from a `CS.Phrase` object into the clip starting
-     *  at a particular time.
-     *
-     *  @param  CS.Phrase   params.phrase           The phrase to insert.
-     *  @param  Number      params.tStart           The time at which to
-     *  insert the phrase.
-     *  @param  Boolean     [params.moveStartMarker=true]  Wether or not to re-locate
-     *  the start marker to the beginning of the newly inserted phrase.
-     *  @param  Boolean     [params.moveEndMarker=true]    Wether or not to move the
-     *  end marker to the end of the newly inserted phrase.
-     **/
-    insert_phrase: function (params) {
+  /**
+   *  Inserts the notes from a `CS.Phrase` object into the clip starting
+   *  at a particular time.
+   *
+   *  @param  CS.Phrase   params.phrase           The phrase to insert.
+   *  @param  Number      params.tStart           The time at which to
+   *  insert the phrase.
+   *  @param  Boolean     [params.moveStartMarker=true]  Wether or not to re-locate
+   *  the start marker to the beginning of the newly inserted phrase.
+   *  @param  Boolean     [params.moveEndMarker=true]    Wether or not to move the
+   *  end marker to the end of the newly inserted phrase.
+   **/
+  CS.Ableton.PhraseRenderingClip.prototype.insert_phrase = function (params) {
 
-      var notes,
-        clip = this._clip,
-        i,
-        tEnd,
-        note,
-        // wether or not the clip is currently looping
-        loopingOn = clip.get("looping")[0],
-        phrase,
-        tStart,
-        moveStartMarker,
-        moveEndMarker;
+    var notes,
+      clip = this._clip,
+      i,
+      tEnd,
+      note,
+      // wether or not the clip is currently looping
+      loopingOn = clip.get("looping")[0],
+      phrase,
+      tStart,
+      moveStartMarker,
+      moveEndMarker;
 
-      if (typeof params === "undefined" || params === null) {
-        throw new Error("params is undefined");
-      }
-
-      if (typeof params.phrase === "undefined" || params.phrase === null) {
-        throw new Error("params.phrase is undefined");
-      }
-      phrase = params.phrase;
-
-      if (typeof params.tStart === "undefined" || params.tStart === null) {
-        throw new Error("params.tStart is undefined");
-      }
-      tStart = params.tStart;
-
-      if (typeof params.moveStartMarker === "undefined" || params.moveStartMarker === null) {
-        params.moveStartMarker = true;
-      }
-      moveStartMarker = params.moveStartMarker;
-
-      if (typeof params.moveEndMarker === "undefined" || params.moveEndMarker === null) {
-        params.moveEndMarker = true;
-      }
-      moveEndMarker = params.moveEndMarker;
-
-      if (phrase.duration === 0) {
-        post("Warning: Phrase duration was 0...skipping");
-        return;
-      }
-
-      tEnd = tStart + phrase.duration;
-      notes = phrase.notes();
-
-      clip.call("deselect_all_notes");
-      clip.call("replace_selected_notes");
-      clip.call("notes", notes.length);
-      for (i = 0; i < notes.length; i++) {
-        note = notes[i];
-        clip.call([
-          "note",
-          note.get("pitch"),
-          (tStart + note.get("time")).toFixed(12),
-          note.get("duration").toFixed(12),
-          note.get("velocity"),
-          note.get("muted")
-        ]);
-      }
-      clip.call("done");
-
-      //post("moving loop markers...\n");
-      if (moveEndMarker) {
-        // move clip end and clip start to boundaries of newly generated clip.
-        //post("\tlooping 0\n");
-        clip.set("looping", 0);
-        //post("\tloop_end " + tEnd.toFixed(3) + "\n");
-        clip.set("loop_end", tEnd.toFixed(3));
-        //post("\tlooping 1\n");
-        clip.set("looping", 1);
-        //post("\tloop_end " + tEnd.toFixed(3) + "\n");
-        clip.set("loop_end", tEnd.toFixed(3));
-        this._currentLoopEndTime = tEnd;
-      }
-     
-      if (moveStartMarker) {
-        // move loop start and loop end to boundaries of newly generated clip
-        //post("\tlooping 0\n");
-        clip.set("looping", 0);
-        //post("\tloop_start " + tStart.toFixed(3) + "\n");
-        clip.set("loop_start", tStart.toFixed(3));
-        //post("\tlooping 1\n");
-        clip.set("looping", 1);
-        //post("\tloop_start " + tStart.toFixed(3) + "\n");
-        clip.set("loop_start", tStart.toFixed(3));
-      }
-
-
-      clip.set("looping", loopingOn);
-
-      //post("done moving loop markers...\n");
-      
-    },
-
-    /**
-     *  Generate a new phrase (based on the probability tables sent in
-     *  at initialization), then insert it at the end of the current clip.
-     *
-     *  @param  Number    duration  Duration of phrase to generate
-     *  @param  Object    [insertParams]  Optional parameters for insert method.  
-     **/
-    generate_and_append: function (duration, insertParams) {
-      var generatedPhrase;
-
-      if (typeof insertParams === "undefined" || insertParams === null) {
-        insertParams = {};
-      }
-
-      this._isGenerating = true;
-
-      generatedPhrase = this._phraseGenerator.generate_phrase(duration);
-
-      insertParams.phrase = generatedPhrase;
-
-      // if tStart was not specified
-      if (typeof insertParams.tStart === "undefined" || insertParams.tStart === null) {
-        // start off where last note left off
-        insertParams.tStart = this._currentEndTime;
-      }
-
-      this.insert_phrase(insertParams);
-      this._currentEndTime += generatedPhrase.duration;
-      
-      this._isGenerating = false;
-    },
-
-    /**
-     *  Same as above, but asynchronous.  Provides an optional callback
-     *  method to execute on completion.
-     *
-     *  @param  Number    duration        Duration of phrase to generate
-     *  @param  Function  [callback]      Optional callback function when complete.
-     *  @param  Object    [insertParams]  Optional parameters for insert method.  
-     **/
-    generate_and_append_async: function (duration, callback, insertParams) {
-      var genTask;
-
-      if (typeof callback === "undefined" || callback === null) {
-        callback = function () {
-        
-        };
-      }
-
-      genTask = new Task(function (args) {
-        this.generate_and_append(args[0], args[2]);
-        args[1]();
-      }, this, [duration, callback, insertParams]);
-      genTask.schedule();
-    },
-
-    /**
-     *  Generate a new phrase that is the duration of the current loop
-     *  and append it after the current loop.
-     **/
-    _generate_and_append_loop: function () {
-      this.generate_and_append(this._originalLoopLength, {
-        // start off where loop ends
-        tStart: this._currentLoopEndTime
-      });
-    },
-    _generate_and_append_loop_async: function () {
-      var generateTask = new Task(function () {
-        this._generate_and_append_loop();
-      }, this);
-
-      generateTask.schedule();
+    if (typeof params === "undefined" || params === null) {
+      throw new Error("params is undefined");
     }
+
+    if (typeof params.phrase === "undefined" || params.phrase === null) {
+      throw new Error("params.phrase is undefined");
+    }
+    phrase = params.phrase;
+
+    if (typeof params.tStart === "undefined" || params.tStart === null) {
+      throw new Error("params.tStart is undefined");
+    }
+    tStart = params.tStart;
+
+    if (typeof params.moveStartMarker === "undefined" || params.moveStartMarker === null) {
+      params.moveStartMarker = true;
+    }
+    moveStartMarker = params.moveStartMarker;
+
+    if (typeof params.moveEndMarker === "undefined" || params.moveEndMarker === null) {
+      params.moveEndMarker = true;
+    }
+    moveEndMarker = params.moveEndMarker;
+
+    if (phrase.duration === 0) {
+      post("Warning: Phrase duration was 0...skipping");
+      return;
+    }
+
+    tEnd = tStart + phrase.duration;
+    notes = phrase.notes();
+
+    clip.call("deselect_all_notes");
+    clip.call("replace_selected_notes");
+    clip.call("notes", notes.length);
+    for (i = 0; i < notes.length; i++) {
+      note = notes[i];
+      clip.call([
+        "note",
+        note.get("pitch"),
+        (tStart + note.get("time")).toFixed(12),
+        note.get("duration").toFixed(12),
+        note.get("velocity"),
+        note.get("muted")
+      ]);
+    }
+    clip.call("done");
+
+    //post("moving loop markers...\n");
+    if (moveEndMarker) {
+      // move clip end and clip start to boundaries of newly generated clip.
+      //post("\tlooping 0\n");
+      clip.set("looping", 0);
+      //post("\tloop_end " + tEnd.toFixed(3) + "\n");
+      clip.set("loop_end", tEnd.toFixed(3));
+      //post("\tlooping 1\n");
+      clip.set("looping", 1);
+      //post("\tloop_end " + tEnd.toFixed(3) + "\n");
+      clip.set("loop_end", tEnd.toFixed(3));
+      this._currentLoopEndTime = tEnd;
+    }
+   
+    if (moveStartMarker) {
+      // move loop start and loop end to boundaries of newly generated clip
+      //post("\tlooping 0\n");
+      clip.set("looping", 0);
+      //post("\tloop_start " + tStart.toFixed(3) + "\n");
+      clip.set("loop_start", tStart.toFixed(3));
+      //post("\tlooping 1\n");
+      clip.set("looping", 1);
+      //post("\tloop_start " + tStart.toFixed(3) + "\n");
+      clip.set("loop_start", tStart.toFixed(3));
+    }
+
+
+    clip.set("looping", loopingOn);
+
+    //post("done moving loop markers...\n");
+    
+  };
+
+  /**
+   *  Generate a new phrase (based on the probability tables sent in
+   *  at initialization), then insert it at the end of the current clip.
+   *
+   *  @param  Number    duration  Duration of phrase to generate
+   *  @param  Object    [insertParams]  Optional parameters for insert method.  
+   **/
+  CS.Ableton.PhraseRenderingClip.prototype.generate_and_append = function (duration, insertParams) {
+    var generatedPhrase;
+
+    if (typeof insertParams === "undefined" || insertParams === null) {
+      insertParams = {};
+    }
+
+    this._isGenerating = true;
+
+    generatedPhrase = this._phraseGenerator.generate_phrase(duration);
+
+    insertParams.phrase = generatedPhrase;
+
+    // if tStart was not specified
+    if (typeof insertParams.tStart === "undefined" || insertParams.tStart === null) {
+      // start off where last note left off
+      insertParams.tStart = this._currentEndTime;
+    }
+
+    this.insert_phrase(insertParams);
+    this._currentEndTime += generatedPhrase.duration;
+    
+    this._isGenerating = false;
+  };
+
+  /**
+   *  Same as above, but asynchronous.  Provides an optional callback
+   *  method to execute on completion.
+   *
+   *  @param  Number    duration        Duration of phrase to generate
+   *  @param  Function  [callback]      Optional callback function when complete.
+   *  @param  Object    [insertParams]  Optional parameters for insert method.  
+   **/
+  CS.Ableton.PhraseRenderingClip.prototype.generate_and_append_async = function (duration, callback, insertParams) {
+    var genTask;
+
+    if (typeof callback === "undefined" || callback === null) {
+      callback = function () {
+      
+      };
+    }
+
+    genTask = new Task(function (args) {
+      this.generate_and_append(args[0], args[2]);
+      args[1]();
+    }, this, [duration, callback, insertParams]);
+    genTask.schedule();
+  };
+
+  /**
+   *  Generate a new phrase that is the duration of the current loop
+   *  and append it after the current loop.
+   **/
+  CS.Ableton.PhraseRenderingClip.prototype._generate_and_append_loop = function () {
+    this.generate_and_append(this._originalLoopLength, {
+      // start off where loop ends
+      tStart: this._currentLoopEndTime
+    });
+  };
+  CS.Ableton.PhraseRenderingClip.prototype._generate_and_append_loop_async = function () {
+    var generateTask = new Task(function () {
+      this._generate_and_append_loop();
+    }, this);
+
+    generateTask.schedule();
   };
 
   /**
@@ -633,159 +628,6 @@
   CS.Ableton.SelfGeneratingClip.prototype.stop = function () {
     this._playingStatusObserver.cancel();
     this._isAutogenerating = false;
-  };
-
-}).call(this);
-
-/**
- *  @file       CSClipAnalyzer.js
- *
- *  @author     Colin Sullivan <colinsul [at] gmail.com>
- *
- *              Copyright (c) 2012 Colin Sullivan
- *              Licensed under the GPLv3 license.
- **/
-
-(function () {
-  "use strict";
-
-
-  var CS;
-  if (typeof require !== "undefined" && require !== null) {
-    CS = require("./CS.js").CS;
-    require("./CSPhrase.js");
-    require("./CSPhraseNote.js");
-  } else {
-    CS = this.CS;
-  }
-  
-  /**
-   *  @class CS.ClipAnalyzer Perform analysis of a single clip and save analysis
-   *  in provided CSMarkovTable.
-   *  
-   *  @extends  CS.Ableton.Clip
-   *
-   *  @param  CSMarkovTable   pitchTable      The table to store pitch
-   *  analysis
-   *  @param  CSMarkovTable   durationTable   The table to store duration
-   *  analysis in
-   *  @param  CSMarkovTable   velocityTable   The table to store velocity
-   *  analysis in.
-   **/
-  CS.ClipAnalyzer = function (params) {
-
-    CS.Ableton.Clip.apply(this, arguments);
-
-    if (typeof params.pitchTable === "undefined" || params.pitchTable === null) {
-      throw new Error("params.pitchTable is undefined");
-    }
-    this.pitchTable = params.pitchTable;
-
-    if (typeof params.durationTable === "undefined" || params.durationTable === null) {
-      throw new Error("params.durationTable is undefined");
-    }
-    this.durationTable = params.durationTable;
-
-    if (typeof params.velocityTable === "undefined" || params.velocityTable === null) {
-      throw new Error("params.velocityTable is undefined");
-    }
-    this.velocityTable = params.velocityTable;
-
-  };
-
-  CS.ClipAnalyzer.prototype = new CS.Ableton.Clip();
-  
-  /**
-   *  @param  Array           notes     List of notes in clip ordered by time.
-   *  @param  CSMarkovTable   table     The markov chain to store analysis
-   *  @param  String          property  The property of the notes to analyze   
-   *  @param  Function        op        Operation to apply to each value pre-markov
-   **/
-  CS.ClipAnalyzer.prototype.markov_note_analysis = function (notes, table, property, op) {
-
-    var i,
-      note,
-      prevNote,
-      prevPrevNote;
-
-    if (typeof op === "undefined" || op === null) {
-      op = function (x) { return x; };
-    }
-
-    // for each note (starting on third note)
-    for (i = 2; i < notes.length; i++) {
-      note = notes[i];
-      prevNote = notes[i - 1];
-      prevPrevNote = notes[i - 2];
-
-      // add this 3-note event to markov table
-      table.add_transition([
-        op(prevPrevNote.get(property)),
-        op(prevNote.get(property)),
-        op(note.get(property))
-      ]);
-
-    }
-  };
-
-  CS.ClipAnalyzer.prototype.fetch_notes = function () {
-    var notes,
-      note,
-      firstNoteInLoopIndex,
-      lastNoteInLoopIndex,
-      loopStart,
-      loopEnd,
-      i,
-      clip = this._clip;
-
-    notes = CS.Ableton.Clip.prototype.fetch_notes.apply(this, arguments);
-
-    // throw away notes before and after loop indicators on MIDI clip
-    firstNoteInLoopIndex = 0;
-    lastNoteInLoopIndex = 0;
-    loopStart = clip.get("loop_start");
-    loopEnd = clip.get("loop_end");
-    // find first note in loop
-    for (i = 0; i < notes.length; i++) {
-      note = notes[i];
-      if (note.get("time") >= loopStart) {
-        firstNoteInLoopIndex = i;
-        break;
-      }
-    }
-
-    // find last note in loop
-    for (i = firstNoteInLoopIndex + 1; i < notes.length; i++) {
-      note = notes[i];
-      if (note.get("time") >= loopEnd) {
-        break;
-      }
-      lastNoteInLoopIndex = i;
-    }
-
-    // discard all other notes
-    notes = notes.slice(firstNoteInLoopIndex, lastNoteInLoopIndex + 1);
-
-    return notes;
-  };
-
-  CS.ClipAnalyzer.prototype.analyze = function () {
-
-    var notesWithRests,
-      notes,
-      pitchTable = this.pitchTable,
-      durationTable = this.durationTable,
-      velocityTable = this.velocityTable;
-
-    notesWithRests = this.phrase.get_notes_with_rests();
-    notes = this.phrase.get_notes();
-
-    this.markov_note_analysis(notesWithRests, pitchTable, "pitch");
-
-    this.markov_note_analysis(notesWithRests, durationTable, "duration");
-
-    // velocity doesn't care about rests
-    this.markov_note_analysis(notes, velocityTable, "velocity");
   };
 
 }).call(this);
