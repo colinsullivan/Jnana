@@ -86,7 +86,9 @@
       markovOrder: 3
     });
 
-    this.track = new LiveAPI("this_device canonical_parent");
+    this.track = new LiveAPI(function () {
+      
+    }, "this_device canonical_parent");
 
     this.analysisClips = [];
     this.generativeClips = [];
@@ -117,7 +119,8 @@
       clipSlotId,
       clipPath,
       clip,
-      clipName;
+      clipName,
+      me = this;
 
     
     /**
@@ -126,34 +129,36 @@
      **/
     trackPath = this.track.path.slice(1, -1);
     clipSlots = this.track.get("clip_slots");
-    
+
+    function process_clip_slot () {
+      if (this.id !== "0") {
+        clipName = this.get("name")[0];
+       
+        // create a CS.Ableton.Clip instance for each clip with a name
+        // ending in a "-01" or such.
+        if (clipName.match(/-[\d]+$/)) {
+          me.analysisClips.push(new CS.Ableton.Clip({
+            clip: this
+          }));
+        // and for all clips ending in "-gen", create self generating
+        // clips with our analyzer
+        } else if (clipName.match(/-auto$/)) {
+          me.generativeClips.push(new CS.Ableton.SelfGeneratingClip({
+            playsTillAutoGenerate: me.playsTillAutoGenerate,
+            clip: this,
+            phraseAnalyzer: me.analyzer
+          }));
+        }
+      }
+    }
+
     // for each clip slot
     for (i = 0; i < clipSlots.length; i += 2) {
       clipSlotId = i / 2;
       clipPath = trackPath + " clip_slots " + clipSlotId + " clip ";
 
-      clip = new LiveAPI(clipPath);
-      if (clip.id !== "0") {
-        clipName = clip.get("name")[0];
-       
-        // create a CS.Ableton.Clip instance for each clip with a name
-        // ending in a "-01" or such.
-        if (clipName.match(/-[\d]+$/)) {
-          this.analysisClips.push(new CS.Ableton.Clip({
-            clip: clip
-          }));
-        // and for all clips ending in "-gen", create self generating
-        // clips with our analyzer
-        } else if (clipName.match(/-auto$/)) {
-          this.generativeClips.push(new CS.Ableton.SelfGeneratingClip({
-            playsTillAutoGenerate: this.playsTillAutoGenerate,
-            clip: clip,
-            phraseAnalyzer: this.analyzer
-          }));
+      clip = new LiveAPI(process_clip_slot, clipPath);
 
-        }
-      
-      }
     }
 
     // now all clips are instantiated, we can analyze.
@@ -167,29 +172,6 @@
 
     this.trackWasAnalyzed = true;
     status_message(this.analysisClips.length + " clips were analyzed.");
-
-
-    /*var track,
-      trackAnalyzer,
-      me = this,
-      numClipsAnalyzed;
-
-
-    track = new LiveAPI(error_aware_callback(function () {
-      post("analyzing track '" + this.get("name") + "'\n");
-      
-      me.trackAnalyzer = trackAnalyzer = new TrackAnalyzer({
-        track: this
-      });
-
-      numClipsAnalyzed = trackAnalyzer.analyze();
-
-    }), "this_device canonical_parent");
-
-    if (!track) {
-      post("no track object!\n");
-      return;
-    }*/
   };
 
   /**

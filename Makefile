@@ -1,37 +1,88 @@
+###
+#   @file       Makefile
+#
+#   @author     Colin Sullivan <colinsul [at] gmail.com>
+#
+#               Copyright (c) 2012 Colin Sullivan
+#               Licensed under the GPLv3 license.
+###
+
+
+###
+#		Change these two lines if your setup is different.
+###
 MAX_JAVSCRIPT_DIR=/Applications/Max5/Cycling\ \'74/jsextensions
 MAX_ABLETON_MIDI_EFFECTS_DIR=~/Library/Application\ Support/Ableton/Library/Presets/MIDI\ Effects/Max\ MIDI\ Effect
 
-all: ./build/CS.js
+###
+#		You probably don't need to change anything below.
+###
 
-./build/CS.js: ./lib/*.js
-	# Concatenating all javascript files in lib folder in a specific order
-	test -d ./build/ || mkdir ./build/
-	cp ./lib/CS.js ./build/CS.js
-	cat ./lib/CSAbletonClip.js >> ./build/CS.js
-	cat ./lib/CSAbletonPhraseRenderingClip.js >> ./build/CS.js
-	cat ./lib/CSHelpers.js >> ./build/CS.js
-	cat ./lib/CSInputAnalyzer.js >> ./build/CS.js
-	cat ./lib/CSAbletonInputAnalyzer.js >> ./build/CS.js
-	cat ./lib/CSPhraseAnalyzer.js >> ./build/CS.js
-	cat ./lib/CSMarkovPhraseGenerator.js >> ./build/CS.js
-	cat ./lib/CSMarkovStateMachine.js >> ./build/CS.js
-	cat ./lib/CSMarkovMultiStateMachine.js >> ./build/CS.js
-	cat ./lib/CSProbabilityVector.js >> ./build/CS.js
-	cat ./lib/CSMarkovTable.js >> ./build/CS.js
-	cat ./lib/CSMarkovTableRow.js >> ./build/CS.js
-	cat ./lib/CSPhrase.js >> ./build/CS.js
-	cat ./lib/CSPhraseNote.js >> ./build/CS.js
+SRC_DIR=./src
+BUILD_DIR=./build
+BUILD_JSEXT=${BUILD_DIR}/jsextensions
+BUILD_MAX=${BUILD_DIR}/Max-MIDI-Effect
+
+CS_LIB=vendor/underscore.js \
+	CSHelpers.js \
+	CSProbabilityVector.js \
+	CSMarkovTableRow.js \
+	CSMarkovTable.js \
+	CSPhraseNote.js \
+	CSPhrase.js \
+	CSMarkovStateMachine.js \
+	CSMarkovMultiStateMachine.js \
+	CSPhraseAnalyzer.js \
+	CSMarkovPhraseGenerator.js \
+	CSAbletonClip.js \
+	CSAbletonPhraseRenderingClip.js \
+	CSInputAnalyzer.js \
+	CSAbletonInputAnalyzer.js
+
+CS_LIB_PATHS=$(addprefix ${SRC_DIR}/,${CS_LIB})
+
+all: ${BUILD_JSEXT}/CSJnanaLive.js ${BUILD_JSEXT}/CSJnanaClips.js ${BUILD_MAX}/CSJnanaLive.amxd ${BUILD_MAX}/CSJnanaClips.amxd
+
+###
+#		Concatenates javascript files in the above list ./build/CS.js in the same
+#		order.
+###
+${BUILD_JSEXT}/CS.js: ${CS_LIB_PATHS}
+	cp ${SRC_DIR}/CS.js ${BUILD_JSEXT}/CS.js
+	for csdep in ${CS_LIB_PATHS}; do \
+		echo "cat $$csdep >> $@" | sh; \
+	done
+
+###
+#		Concatenates the entirety of CS.js then the files that are referenced
+#		directly by the max patches.
+###
+${BUILD_JSEXT}/CSJnanaLive.js: ${BUILD_JSEXT}/CS.js ${SRC_DIR}/CSJnanaLive.js
+	cat $< > $@
+	cat ${SRC_DIR}/CSJnanaLive.js >> $@
+
+${BUILD_JSEXT}/CSJnanaClips.js: ${BUILD_JSEXT}/CS.js ${SRC_DIR}/CSJnanaClips.js
+	cat $< > $@
+	cat ${SRC_DIR}/CSJnanaClips.js >> $@
+
+###
+#		Copies the Max/MSP patches themselves into the build directory.
+###
+${BUILD_MAX}/CSJnanaLive.amxd: ${SRC_DIR}/CSJnanaLive.amxd
+	cp $< $@
+
+${BUILD_MAX}/CSJnanaClips.amxd: ${SRC_DIR}/CSJnanaClips.amxd
+	cp $< $@
 
 clean:
-	rm ./build/CS.js
+	rm ${BUILD_JSEXT}/*
+	rm ${BUILD_MAX}/*
 
 install:
-	cp ./lib/vendor/*.js ${MAX_JAVSCRIPT_DIR}
-	cp ./lib/CSJnanaClips.js ${MAX_JAVSCRIPT_DIR}/
-	cp ./lib/CSJnanaLive.js ${MAX_JAVSCRIPT_DIR}/
-	cp ./build/CS.js ${MAX_JAVSCRIPT_DIR}/
+	cp ${BUILD_JSEXT}/CSJnanaLive.js ${MAX_JAVSCRIPT_DIR}/
+	cp ${BUILD_JSEXT}/CSJnanaClips.js ${MAX_JAVSCRIPT_DIR}/
 	test -d ${MAX_ABLETON_MIDI_EFFECTS_DIR}/CS\ Devices/ || mkdir ${MAX_ABLETON_MIDI_EFFECTS_DIR}/CS\ Devices/
-	cp ./ableton/* ${MAX_ABLETON_MIDI_EFFECTS_DIR}/CS\ Devices/
+	cp ${BUILD_MAX}/* ${MAX_ABLETON_MIDI_EFFECTS_DIR}/CS\ Devices/
 
 test:
 	mocha ./tests/*.js
