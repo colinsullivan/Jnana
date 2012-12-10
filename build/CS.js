@@ -43,12 +43,12 @@
   }
 
  /**
-  *   @class  CS.AbletonClip  Parsing and instantiation of Ableton clip
+  *   @class  CS.Ableton.Clip  Parsing and instantiation of Ableton clip
   *   information into JavaScript data structures.
   *
   *   @param  Clip          clip              The clip to analyze
   **/
-  CS.AbletonClip = function (params) {
+  CS.Ableton.Clip = function (params) {
     if (typeof params === "undefined" || params === null) {
       // assuming constructor was used as super class
       return;
@@ -77,7 +77,7 @@
 
   };
 
-  CS.AbletonClip.prototype = {
+  CS.Ableton.Clip.prototype = {
 
     fetch_notes: function () {
       var name,
@@ -238,7 +238,7 @@
     // determine currentEndTime now the long way, but maintain for future
     // reference.  ASSUMPTION: the clip is only being modified from this
     // class instance, and nowhere else.
-    abletonClip = new CS.AbletonClip({
+    abletonClip = new CS.Ableton.Clip({
       clip: clip
     });
     this._currentEndTime = abletonClip.phrase.duration;
@@ -513,6 +513,10 @@
     STOPPED: 2
   };
 
+  CS.Ableton.SelfGeneratingClip.prototype.set_plays_till_autogen = function (playsTill) {
+    this._playsTillAutoGenerate = playsTill;
+  };
+
   CS.Ableton.SelfGeneratingClip.prototype.set_playbackEndedCallback = function (cb) {
     if (typeof cb === "undefined" || cb === null) {
       cb = function () {
@@ -659,7 +663,7 @@
    *  @class CS.ClipAnalyzer Perform analysis of a single clip and save analysis
    *  in provided CSMarkovTable.
    *  
-   *  @extends  CS.AbletonClip
+   *  @extends  CS.Ableton.Clip
    *
    *  @param  CSMarkovTable   pitchTable      The table to store pitch
    *  analysis
@@ -670,7 +674,7 @@
    **/
   CS.ClipAnalyzer = function (params) {
 
-    CS.AbletonClip.apply(this, arguments);
+    CS.Ableton.Clip.apply(this, arguments);
 
     if (typeof params.pitchTable === "undefined" || params.pitchTable === null) {
       throw new Error("params.pitchTable is undefined");
@@ -689,7 +693,7 @@
 
   };
 
-  CS.ClipAnalyzer.prototype = new CS.AbletonClip();
+  CS.ClipAnalyzer.prototype = new CS.Ableton.Clip();
   
   /**
    *  @param  Array           notes     List of notes in clip ordered by time.
@@ -734,7 +738,7 @@
       i,
       clip = this._clip;
 
-    notes = CS.AbletonClip.prototype.fetch_notes.apply(this, arguments);
+    notes = CS.Ableton.Clip.prototype.fetch_notes.apply(this, arguments);
 
     // throw away notes before and after loop indicators on MIDI clip
     firstNoteInLoopIndex = 0;
@@ -1040,6 +1044,13 @@ if (typeof exports !== "undefined" && exports !== null) {
     post = this.post;
   }
 
+  /**
+   *  @class    CS.Ableton.InputAnalyzer    In addition to handling incoming
+   *  notes and detecting an end-of-phrase, creates context in which to 
+   *  analyze these phrases and initiates generated responses.
+   *
+   *  @extends  CS.InputAnalyzer
+   **/
   CS.Ableton.InputAnalyzer = function (params) {
     var me = this,
       clipSlots,

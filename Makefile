@@ -9,7 +9,6 @@ all: ./build/CS.js
 	cp ./lib/CS.js ./build/CS.js
 	cat ./lib/CSAbletonClip.js >> ./build/CS.js
 	cat ./lib/CSAbletonPhraseRenderingClip.js >> ./build/CS.js
-	cat ./lib/CSClipAnalyzer.js >> ./build/CS.js
 	cat ./lib/CSHelpers.js >> ./build/CS.js
 	cat ./lib/CSInputAnalyzer.js >> ./build/CS.js
 	cat ./lib/CSAbletonInputAnalyzer.js >> ./build/CS.js
