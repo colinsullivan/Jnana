@@ -1262,6 +1262,357 @@ if (typeof exports !== "undefined" && exports !== null) {
   exports.maybe = maybe;
 }
 /**
+ *  @file       CSPhraseNote.js
+ *
+ *  @author     Colin Sullivan <colinsul [at] gmail.com>
+ *
+ *              Copyright (c) 2012 Colin Sullivan
+ *              Licensed under the GPLv3 license.
+ **/
+
+(function () {
+  "use strict";
+  
+  var _, CS, PhraseNote, root = this;
+
+  if (typeof require !== "undefined" && require !== null) {
+    root._ = require("./vendor/underscore.js")._;
+    CS = require("./CS.js").CS;
+  } else {
+    CS = this.CS;
+  }
+ 
+  /**
+   *  @class    CS.PhraseNote   Simple encapsulation around properties of
+   *  the note such as velocity, pitch, etc.
+   **/
+  CS.PhraseNote = function (params) {
+
+    if (typeof params === "undefined" || params === null) {
+      params = {};
+    }
+    this._attributes = root._.clone(params);
+  };
+
+  CS.PhraseNote.prototype = {
+
+    get: function (attrName) {
+      return this._attributes[attrName];
+    },
+
+    set: function (attrNameOrAttrsToSet, attrValueOrNull) {
+      var attrName,
+        attrValue,
+        attrsToSet,
+        onTime,
+        offTime,
+        _ = root._;
+
+      if (typeof attrNameOrAttrsToSet === "object") {
+        attrsToSet = attrNameOrAttrsToSet;
+      } else if (typeof attrNameOrAttrsToSet === "string") {
+        attrsToSet = {};
+        attrsToSet[attrNameOrAttrsToSet] = attrValueOrNull;
+      }
+
+      /*// if we're changing timestamps
+      if (_.has(attrsToSet, "onTime") || _.has(attrsToSet, "offTime")) {
+        onTime = attrsToSet.onTime || this.get("onTime");
+        offTime = attrsToSet.offTime || this.get("offTime");
+
+        // and we have both timestamps, recalculate duration
+        if (
+          typeof offTime !== "undefined" && offTime !== null
+            && typeof onTime !== "undefined" && onTime !== null
+        ) {
+          attrsToSet.duration = (offTime - onTime);
+        }
+      }*/
+      
+      _.extend(this._attributes, attrsToSet);
+    },
+
+    attributes: function () {
+      return root._.clone(this._attributes);
+    }
+
+  };
+  
+}).call(this);
+
+/**
+ *  @file       CSPhrase.js
+ *
+ *  @author     Colin Sullivan <colinsul [at] gmail.com>
+ *
+ *              Copyright (c) 2012 Colin Sullivan
+ *              Licensed under the GPLv3 license.
+ **/
+
+(function () {
+  "use strict";
+
+  var CS, root = this, post;
+
+  if (typeof require !== "undefined" && require !== null) {
+    CS = require("./CS.js").CS;
+    require("./CSPhraseNote.js");
+    this._ = require("./vendor/underscore.js")._;
+    post = console.log;
+  } else {
+    CS = this.CS;
+    post = this.post;
+  }
+  
+  /**
+   *  @class  CS.Phrase  A collection of notes with timestamps.
+   *
+   *  @param  Array  params.notes  Notes in this phrase; `CS.PhraseNote` instances.
+   **/
+  CS.Phrase = function (params) {
+    var lastNote;
+
+    if (typeof params === "undefined" || params === null) {
+      throw new Error("params is undefined");
+    }
+
+    if (typeof params.notes === "undefined" || params.notes === null) {
+      throw new Error("params.notes is undefined");
+    }
+    this._notes = params.notes;
+
+    if (typeof params.duration === "undefined" || params.duration === null) {
+      // determine duration of phrase based on notes.
+      this.duration = 0;
+      if (this._notes.length) {
+
+        // duration of phrase is end time of last note
+        lastNote = this._notes[this._notes.length - 1];
+
+        this.duration = lastNote.get("time") + lastNote.get("duration");
+        post("this.duration:\n");
+        post(this.duration);
+        post("\n");
+      }
+    } else {
+      // assume user of API knows duration of phrase
+      this.duration = params.duration;
+    }
+
+
+
+  };
+
+  CS.Phrase.prototype = {
+
+    /**
+     *  Returns a list of notes in the phrase.
+     **/
+    get_notes: function () {
+      return root._.clone(this._notes);
+    },
+
+    /**
+     *  Returns a list of the notes in the phrase, but with additional
+     *  notes with a pitch of -1 each time a rest is found.
+     **/
+    get_notes_with_rests: function () {
+      var lastNoteEndTime,
+        notesWithRests = [],
+        notes = this._notes,
+        note,
+        gapDuration,
+        i;
+
+      // create rests (note with pitch of -1) for each empty space
+      lastNoteEndTime = notes[0].get("time") + notes[0].get("duration");
+      notesWithRests.push(notes[0]);
+      for (i = 1; i < notes.length; i++) {
+        note = notes[i];
+
+        // if there was a gap between the end of the last note and the start
+        // of this note, we need to insert a rest for that duration
+        gapDuration = note.get("time") - lastNoteEndTime;
+        if (gapDuration > 0.05) {
+          notesWithRests.push(new CS.PhraseNote({
+            pitch: -1,
+            duration: gapDuration,
+            time: lastNoteEndTime,
+            velocity: 0,
+            muted: true
+          }));
+        }
+
+        lastNoteEndTime = note.get("time") + note.get("duration");
+        notesWithRests.push(note);
+      }
+
+      return notesWithRests;
+      
+    },
+
+    notes: function () {
+      return root._.clone(this._notes);
+    }
+
+  };
+
+}).call(this);
+
+/**
+ *  @file       CSAbletonClip.js
+ *
+ *  @author     Colin Sullivan <colinsul [at] gmail.com>
+ *
+ *              Copyright (c) 2012 Colin Sullivan
+ *              Licensed under the GPLv3 license.
+ **/
+
+/*global post */
+
+(function () {
+  "use strict";
+
+  var CS;
+  if (typeof require !== "undefined" && require !== null) {
+    CS = require("./CS.js").CS;
+    require("./CSPhrase.js");
+    require("./CSPhraseNote.js");
+  } else {
+    CS = this.CS;
+  }
+
+ /**
+  *   @class  CS.Ableton.Clip  Parsing and instantiation of Ableton clip
+  *   information into JavaScript data structures.
+  *
+  *   @param  Clip          clip              The clip to analyze
+  **/
+  CS.Ableton.Clip = function (params) {
+    if (typeof params === "undefined" || params === null) {
+      // assuming constructor was used as super class
+      return;
+    }
+
+    if (typeof params.clip === "undefined" || params.clip === null) {
+      throw new Error("params.clip is undefined");
+    }
+    /**
+     *  Reference to the `LiveAPI` instance pointing to the clip in Ableton.
+     **/
+    this._clip = params.clip;
+
+    /**
+     *  Keep track of loop length as it was originally.  Useful when generating
+     *  new clip so length of loop doesn't drift.
+     **/
+    this.loopLength = this._clip.get("length")[0];
+
+    /**
+     *  `CSPhrase` instance populated with parsed note data from Ableton.
+     **/
+    this.phrase = new CS.Phrase({
+      notes: this.fetch_notes()
+    });
+
+  };
+
+  CS.Ableton.Clip.prototype = {
+
+    fetch_notes: function () {
+      var name,
+        rawNotes,
+        maxNumNotes,
+        notes = [],
+        noteProperties,
+        note,
+        i,
+        clip = this._clip;
+
+
+      if (Number(clip.id) === 0) {
+        // no clip was present
+        return false;
+      }
+
+      name = clip.get("name");
+
+      /*post("\n--------\nAnalyzing: " + name + "\n--------\n");*/
+     
+      //post("calling `select_all_notes`\n");
+      clip.call("select_all_notes");
+
+      //post("calling `get_selected_notes`\n");
+      rawNotes = clip.call("get_selected_notes");
+      
+      // grab maxNumNotes
+      if (rawNotes[0] !== "notes") {
+        post("Unexpected note output!\n");
+        return;
+      }
+
+      // this is the maximum number of notes because Ableton doesn't report
+      // accurate data especially when there is a large amount of notes
+      // in the clip.
+      maxNumNotes = rawNotes[1];
+
+      // remove maxNumNotes
+      rawNotes = rawNotes.slice(2);
+
+      /*post("rawNotes.length:\n");
+      post(rawNotes.length);
+      post("\n");
+
+      post("maxNumNotes * 6:\n");
+      post(maxNumNotes * 6);
+      post("\n");*/
+
+      post("extracting notes\n");
+
+      for (i = 0; i < (maxNumNotes * 6); i += 6) {
+        // extract note properties from array given from Ableton
+        noteProperties = {
+          pitch: rawNotes[i + 1],
+          time: rawNotes[i + 2],
+          duration: rawNotes[i + 3],
+          velocity: rawNotes[i + 4],
+          muted: rawNotes[i + 5] === 1
+        };
+
+        // if this is a valid note
+        if (
+          rawNotes[i] === "note" &&
+            typeof(noteProperties.pitch) === "number" &&
+              typeof(noteProperties.time) === "number" &&
+                typeof(noteProperties.duration) === "number" &&
+                  typeof(noteProperties.velocity) === "number" &&
+                    typeof(noteProperties.muted) === "boolean"
+        ) {
+          note = new CS.PhraseNote(noteProperties);
+          notes.push(note);
+        }
+      }
+
+      if (notes.length !== maxNumNotes) {
+        post("Error parsing note data!\n\tGot " + notes.length + " notes but expected " + maxNumNotes + " notes.");
+        return;
+      }
+
+      //post("organizing notes...");
+
+      // sort notes by time
+      notes.sort(function (a, b) {
+        return (a.get("time") <= b.get("time")) ? -1 : 1;
+      });
+
+      return notes;
+      
+    }
+  
+  };
+  
+}).call(this);
+/**
  *  @file       CSProbabilityVector.js
  *
  *  @author     Colin Sullivan <colinsul [at] gmail.com>
@@ -1709,204 +2060,6 @@ if (typeof exports !== "undefined" && exports !== null) {
 
 }).call(this);
 
-
-/**
- *  @file       CSPhraseNote.js
- *
- *  @author     Colin Sullivan <colinsul [at] gmail.com>
- *
- *              Copyright (c) 2012 Colin Sullivan
- *              Licensed under the GPLv3 license.
- **/
-
-(function () {
-  "use strict";
-  
-  var _, CS, PhraseNote, root = this;
-
-  if (typeof require !== "undefined" && require !== null) {
-    root._ = require("./vendor/underscore.js")._;
-    CS = require("./CS.js").CS;
-  } else {
-    CS = this.CS;
-  }
- 
-  /**
-   *  @class    CS.PhraseNote   Simple encapsulation around properties of
-   *  the note such as velocity, pitch, etc.
-   **/
-  CS.PhraseNote = function (params) {
-
-    if (typeof params === "undefined" || params === null) {
-      params = {};
-    }
-    this._attributes = root._.clone(params);
-  };
-
-  CS.PhraseNote.prototype = {
-
-    get: function (attrName) {
-      return this._attributes[attrName];
-    },
-
-    set: function (attrNameOrAttrsToSet, attrValueOrNull) {
-      var attrName,
-        attrValue,
-        attrsToSet,
-        onTime,
-        offTime,
-        _ = root._;
-
-      if (typeof attrNameOrAttrsToSet === "object") {
-        attrsToSet = attrNameOrAttrsToSet;
-      } else if (typeof attrNameOrAttrsToSet === "string") {
-        attrsToSet = {};
-        attrsToSet[attrNameOrAttrsToSet] = attrValueOrNull;
-      }
-
-      /*// if we're changing timestamps
-      if (_.has(attrsToSet, "onTime") || _.has(attrsToSet, "offTime")) {
-        onTime = attrsToSet.onTime || this.get("onTime");
-        offTime = attrsToSet.offTime || this.get("offTime");
-
-        // and we have both timestamps, recalculate duration
-        if (
-          typeof offTime !== "undefined" && offTime !== null
-            && typeof onTime !== "undefined" && onTime !== null
-        ) {
-          attrsToSet.duration = (offTime - onTime);
-        }
-      }*/
-      
-      _.extend(this._attributes, attrsToSet);
-    },
-
-    attributes: function () {
-      return root._.clone(this._attributes);
-    }
-
-  };
-  
-}).call(this);
-
-/**
- *  @file       CSPhrase.js
- *
- *  @author     Colin Sullivan <colinsul [at] gmail.com>
- *
- *              Copyright (c) 2012 Colin Sullivan
- *              Licensed under the GPLv3 license.
- **/
-
-(function () {
-  "use strict";
-
-  var CS, root = this, post;
-
-  if (typeof require !== "undefined" && require !== null) {
-    CS = require("./CS.js").CS;
-    require("./CSPhraseNote.js");
-    this._ = require("./vendor/underscore.js")._;
-    post = console.log;
-  } else {
-    CS = this.CS;
-    post = this.post;
-  }
-  
-  /**
-   *  @class  CS.Phrase  A collection of notes with timestamps.
-   *
-   *  @param  Array  params.notes  Notes in this phrase; `CS.PhraseNote` instances.
-   **/
-  CS.Phrase = function (params) {
-    var lastNote;
-
-    if (typeof params === "undefined" || params === null) {
-      throw new Error("params is undefined");
-    }
-
-    if (typeof params.notes === "undefined" || params.notes === null) {
-      throw new Error("params.notes is undefined");
-    }
-    this._notes = params.notes;
-
-    if (typeof params.duration === "undefined" || params.duration === null) {
-      // determine duration of phrase based on notes.
-      this.duration = 0;
-      if (this._notes.length) {
-
-        // duration of phrase is end time of last note
-        lastNote = this._notes[this._notes.length - 1];
-
-        this.duration = lastNote.get("time") + lastNote.get("duration");
-        post("this.duration:\n");
-        post(this.duration);
-        post("\n");
-      }
-    } else {
-      // assume user of API knows duration of phrase
-      this.duration = params.duration;
-    }
-
-
-
-  };
-
-  CS.Phrase.prototype = {
-
-    /**
-     *  Returns a list of notes in the phrase.
-     **/
-    get_notes: function () {
-      return root._.clone(this._notes);
-    },
-
-    /**
-     *  Returns a list of the notes in the phrase, but with additional
-     *  notes with a pitch of -1 each time a rest is found.
-     **/
-    get_notes_with_rests: function () {
-      var lastNoteEndTime,
-        notesWithRests = [],
-        notes = this._notes,
-        note,
-        gapDuration,
-        i;
-
-      // create rests (note with pitch of -1) for each empty space
-      lastNoteEndTime = notes[0].get("time") + notes[0].get("duration");
-      notesWithRests.push(notes[0]);
-      for (i = 1; i < notes.length; i++) {
-        note = notes[i];
-
-        // if there was a gap between the end of the last note and the start
-        // of this note, we need to insert a rest for that duration
-        gapDuration = note.get("time") - lastNoteEndTime;
-        if (gapDuration > 0.05) {
-          notesWithRests.push(new CS.PhraseNote({
-            pitch: -1,
-            duration: gapDuration,
-            time: lastNoteEndTime,
-            velocity: 0,
-            muted: true
-          }));
-        }
-
-        lastNoteEndTime = note.get("time") + note.get("duration");
-        notesWithRests.push(note);
-      }
-
-      return notesWithRests;
-      
-    },
-
-    notes: function () {
-      return root._.clone(this._notes);
-    }
-
-  };
-
-}).call(this);
 
 /**
  *  @file       CSMarkovStateMachine.js
@@ -2567,159 +2720,6 @@ if (typeof exports !== "undefined" && exports !== null) {
   };
 }).call(this);
 
-/**
- *  @file       CSAbletonClip.js
- *
- *  @author     Colin Sullivan <colinsul [at] gmail.com>
- *
- *              Copyright (c) 2012 Colin Sullivan
- *              Licensed under the GPLv3 license.
- **/
-
-/*global post */
-
-(function () {
-  "use strict";
-
-  var CS;
-  if (typeof require !== "undefined" && require !== null) {
-    CS = require("./CS.js").CS;
-    require("./CSPhrase.js");
-    require("./CSPhraseNote.js");
-  } else {
-    CS = this.CS;
-  }
-
- /**
-  *   @class  CS.Ableton.Clip  Parsing and instantiation of Ableton clip
-  *   information into JavaScript data structures.
-  *
-  *   @param  Clip          clip              The clip to analyze
-  **/
-  CS.Ableton.Clip = function (params) {
-    if (typeof params === "undefined" || params === null) {
-      // assuming constructor was used as super class
-      return;
-    }
-
-    if (typeof params.clip === "undefined" || params.clip === null) {
-      throw new Error("params.clip is undefined");
-    }
-    /**
-     *  Reference to the `LiveAPI` instance pointing to the clip in Ableton.
-     **/
-    this._clip = params.clip;
-
-    /**
-     *  Keep track of loop length as it was originally.  Useful when generating
-     *  new clip so length of loop doesn't drift.
-     **/
-    this.loopLength = this._clip.get("length")[0];
-
-    /**
-     *  `CSPhrase` instance populated with parsed note data from Ableton.
-     **/
-    this.phrase = new CS.Phrase({
-      notes: this.fetch_notes()
-    });
-
-  };
-
-  CS.Ableton.Clip.prototype = {
-
-    fetch_notes: function () {
-      var name,
-        rawNotes,
-        maxNumNotes,
-        notes = [],
-        noteProperties,
-        note,
-        i,
-        clip = this._clip;
-
-
-      if (Number(clip.id) === 0) {
-        // no clip was present
-        return false;
-      }
-
-      name = clip.get("name");
-
-      /*post("\n--------\nAnalyzing: " + name + "\n--------\n");*/
-     
-      //post("calling `select_all_notes`\n");
-      clip.call("select_all_notes");
-
-      //post("calling `get_selected_notes`\n");
-      rawNotes = clip.call("get_selected_notes");
-      
-      // grab maxNumNotes
-      if (rawNotes[0] !== "notes") {
-        post("Unexpected note output!\n");
-        return;
-      }
-
-      // this is the maximum number of notes because Ableton doesn't report
-      // accurate data especially when there is a large amount of notes
-      // in the clip.
-      maxNumNotes = rawNotes[1];
-
-      // remove maxNumNotes
-      rawNotes = rawNotes.slice(2);
-
-      /*post("rawNotes.length:\n");
-      post(rawNotes.length);
-      post("\n");
-
-      post("maxNumNotes * 6:\n");
-      post(maxNumNotes * 6);
-      post("\n");*/
-
-      post("extracting notes\n");
-
-      for (i = 0; i < (maxNumNotes * 6); i += 6) {
-        // extract note properties from array given from Ableton
-        noteProperties = {
-          pitch: rawNotes[i + 1],
-          time: rawNotes[i + 2],
-          duration: rawNotes[i + 3],
-          velocity: rawNotes[i + 4],
-          muted: rawNotes[i + 5] === 1
-        };
-
-        // if this is a valid note
-        if (
-          rawNotes[i] === "note" &&
-            typeof(noteProperties.pitch) === "number" &&
-              typeof(noteProperties.time) === "number" &&
-                typeof(noteProperties.duration) === "number" &&
-                  typeof(noteProperties.velocity) === "number" &&
-                    typeof(noteProperties.muted) === "boolean"
-        ) {
-          note = new CS.PhraseNote(noteProperties);
-          notes.push(note);
-        }
-      }
-
-      if (notes.length !== maxNumNotes) {
-        post("Error parsing note data!\n\tGot " + notes.length + " notes but expected " + maxNumNotes + " notes.");
-        return;
-      }
-
-      //post("organizing notes...");
-
-      // sort notes by time
-      notes.sort(function (a, b) {
-        return (a.get("time") <= b.get("time")) ? -1 : 1;
-      });
-
-      return notes;
-      
-    }
-  
-  };
-  
-}).call(this);
 /**
  *  @file       CSAbletonPhraseRenderingClip.js
  *
