@@ -210,6 +210,12 @@
     }, this.track.path.slice(1, -1));
     this.trackStoppingWatcher.property = "playing_slot_index";
 
+    if (!this.shouldAutoTrain) {
+      this.status_message_out("Analysis is off.");
+    } else {
+      this.status_message_out("Auto training enabled.");
+    }
+
   };
 
   /**
@@ -253,11 +259,15 @@
    *  @param  Booleanish  value  Should always passthrough
    **/
   this.set_midi_passthrough_always = function (value) {
+    var prevMidiPassthroughAlways = this.midiPassthroughAlways;
+
     this.midiPassthroughAlways = Boolean(value);
 
     if (this.midiPassthroughAlways) {
       this.set_midi_passthrough(true);
       this.set_track_armed(true);
+    } else if (prevMidiPassthroughAlways) {
+      this.set_midi_passthrough(false);
     }
 
   };
@@ -268,7 +278,7 @@
    *  @param  Booleanish  value  Wether or not to passthrough
    **/
   this.set_midi_passthrough = function (value) {
-    this.outlet(1, Number(value));
+    this.outlet(1, [Number(value)]);
   };
 
   /**
@@ -334,7 +344,7 @@
     var isNoteOn = noteon === 1,
       noteData,
       currentNumNotesInPhrase;
-    
+
     if (
       // if we are not auto-training
       !this.shouldAutoTrain &&
@@ -378,6 +388,7 @@
     // just initializing plugin
     if (this.shouldAutoTrain && this.track) {
       this.set_track_armed(true);
+      this.status_message_out("Auto training enabled.");
     }
   };
 
