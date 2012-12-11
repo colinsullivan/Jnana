@@ -31,8 +31,7 @@
     var lastNote;
 
     if (typeof params === "undefined" || params === null) {
-      // assume subclassing
-      return;
+      throw new Error("params is undefined");
     }
 
     if (typeof params.notes === "undefined" || params.notes === null) {

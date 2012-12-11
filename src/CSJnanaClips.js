@@ -120,8 +120,7 @@
       clipPath,
       clip,
       clipName,
-      me = this,
-      process_clip_slot;
+      me = this;
 
     
     /**
@@ -131,19 +130,9 @@
     trackPath = this.track.path.slice(1, -1);
     clipSlots = this.track.get("clip_slots");
 
-    /**
-     *  Process a single clip slot.
-     **/
-    process_clip_slot = error_aware_callback(function () {
-      post("this.id:\n");
-      post(this.id);
-      post("\n");
-      post("i:\n");
-      post(i);
-      post("\n");
+    function process_clip_slot () {
       if (this.id !== "0") {
         clipName = this.get("name")[0];
-        post("\n--------\nProcessing: " + clipName + "\n--------\n");
        
         // create a CS.Ableton.Clip instance for each clip with a name
         // ending in a "-01" or such.
@@ -161,40 +150,28 @@
           }));
         }
       }
+    }
 
-      i += 2;
-      if (i < clipSlots.length) {
-        clipSlotId = i / 2;
-        clipPath = trackPath + " clip_slots " + clipSlotId + " clip ";
-        this.path = clipPath;
-      } else {
-        // now all clips are instantiated, we can analyze.
-        for (i = 0; i < me.analysisClips.length; i++) {
-          clip = me.analysisClips[i];
-          me.analyzer.incorporate_phrase(clip.phrase);
-        }
-
-        // initiate auto-generation if it was toggled before track was analyzed
-        me.set_autogen(me.autoGenerateClips);
-
-        me.trackWasAnalyzed = true;
-        status_message(me.analysisClips.length + " clips were analyzed.");
-      
-      }
-    });
-
-    i = 0;
-    clipSlotId = i / 2;
-    clipPath = trackPath + " clip_slots " + clipSlotId + " clip ";
-    clip = new LiveAPI(process_clip_slot, clipPath);
-
-    /*// for each clip slot
+    // for each clip slot
     for (i = 0; i < clipSlots.length; i += 2) {
+      clipSlotId = i / 2;
+      clipPath = trackPath + " clip_slots " + clipSlotId + " clip ";
 
       clip = new LiveAPI(process_clip_slot, clipPath);
 
-    }*/
+    }
 
+    // now all clips are instantiated, we can analyze.
+    for (i = 0; i < this.analysisClips.length; i++) {
+      clip = this.analysisClips[i];
+      this.analyzer.incorporate_phrase(clip.phrase);
+    }
+
+    // initiate auto-generation if it was toggled before track was analyzed
+    this.set_autogen(this.autoGenerateClips);
+
+    this.trackWasAnalyzed = true;
+    status_message(this.analysisClips.length + " clips were analyzed.");
   };
 
   /**
