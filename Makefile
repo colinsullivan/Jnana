@@ -41,7 +41,7 @@ CS_LIB=vendor/underscore.js \
 
 CS_LIB_PATHS=$(addprefix ${SRC_DIR}/,${CS_LIB})
 
-all: ${BUILD_JSEXT}/CSJnanaLive.js ${BUILD_JSEXT}/CSJnanaClips.js ${BUILD_MAX}/CSJnanaLive.amxd ${BUILD_MAX}/CSJnanaClips.amxd
+all: ${BUILD_JSEXT}/CS.js ${BUILD_JSEXT}/CSJnanaLive.js ${BUILD_JSEXT}/CSJnanaClips.js ${BUILD_MAX}/CSJnanaLive.amxd ${BUILD_MAX}/CSJnanaClips.amxd
 
 ###
 #		Concatenates javascript files in the above list ./build/CS.js in the same
@@ -57,11 +57,11 @@ ${BUILD_JSEXT}/CS.js: ${CS_LIB_PATHS}
 #		Concatenates the entirety of CS.js then the files that are referenced
 #		directly by the max patches.
 ###
-${BUILD_JSEXT}/CSJnanaLive.js: ${BUILD_JSEXT}/CS.js ${SRC_DIR}/CSJnanaLive.js
+${BUILD_JSEXT}/CSJnanaLive.js: ${SRC_DIR}/CSJnanaLive.js
 	cat $< > $@
 	cat ${SRC_DIR}/CSJnanaLive.js >> $@
 
-${BUILD_JSEXT}/CSJnanaClips.js: ${BUILD_JSEXT}/CS.js ${SRC_DIR}/CSJnanaClips.js
+${BUILD_JSEXT}/CSJnanaClips.js: ${SRC_DIR}/CSJnanaClips.js
 	cat $< > $@
 	cat ${SRC_DIR}/CSJnanaClips.js >> $@
 
@@ -79,6 +79,7 @@ clean:
 	rm ${BUILD_MAX}/*
 
 install:
+	cp ${BUILD_JSEXT}/CS.js ${MAX_JAVSCRIPT_DIR}/
 	cp ${BUILD_JSEXT}/CSJnanaLive.js ${MAX_JAVSCRIPT_DIR}/
 	cp ${BUILD_JSEXT}/CSJnanaClips.js ${MAX_JAVSCRIPT_DIR}/
 	test -d ${MAX_ABLETON_MIDI_EFFECTS_DIR}/CS\ Devices/ || mkdir ${MAX_ABLETON_MIDI_EFFECTS_DIR}/CS\ Devices/

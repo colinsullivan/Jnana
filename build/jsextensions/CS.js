@@ -2617,8 +2617,6 @@ if (typeof exports !== "undefined" && exports !== null) {
 
 
     CS.Phrase.call(this, params);
-    post("Hello\n");
-
 
     /**
      *  Keep track of loop length as it was originally.  Useful when generating
@@ -2783,7 +2781,7 @@ if (typeof exports !== "undefined" && exports !== null) {
     // determine currentEndTime now the long way, but maintain for future
     // reference.  ASSUMPTION: the clip is only being modified from this
     // class instance, and nowhere else.
-    this._currentEndTime = this.phrase.duration;
+    this._currentEndTime = this.duration;
 
     this._originalLoopLength = this.loopLength;
 
