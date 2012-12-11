@@ -1822,7 +1822,8 @@ if (typeof exports !== "undefined" && exports !== null) {
     var lastNote;
 
     if (typeof params === "undefined" || params === null) {
-      throw new Error("params is undefined");
+      // assume subclassing
+      return;
     }
 
     if (typeof params.notes === "undefined" || params.notes === null) {
@@ -2581,7 +2582,7 @@ if (typeof exports !== "undefined" && exports !== null) {
 (function () {
   "use strict";
 
-  var CS;
+  var CS, root = this;
   if (typeof require !== "undefined" && require !== null) {
     CS = require("./CS.js").CS;
     require("./CSPhrase.js");
@@ -2597,6 +2598,8 @@ if (typeof exports !== "undefined" && exports !== null) {
   *   @param  Clip          clip              The clip to analyze
   **/
   CS.Ableton.Clip = function (params) {
+    var notes;
+
     if (typeof params === "undefined" || params === null) {
       // assuming constructor was used as super class
       return;
@@ -2610,113 +2613,108 @@ if (typeof exports !== "undefined" && exports !== null) {
      **/
     this._clip = params.clip;
 
+    params.notes = this.fetch_notes();
+
+
+    CS.Phrase.call(this, params);
+    post("Hello\n");
+
+
     /**
      *  Keep track of loop length as it was originally.  Useful when generating
      *  new clip so length of loop doesn't drift.
      **/
     this.loopLength = this._clip.get("length")[0];
 
-    /**
-     *  `CSPhrase` instance populated with parsed note data from Ableton.
-     **/
-    this.phrase = new CS.Phrase({
-      notes: this.fetch_notes()
-    });
-
   };
 
-  CS.Ableton.Clip.prototype = {
+  CS.Ableton.Clip.prototype = new CS.Phrase();
 
-    fetch_notes: function () {
-      var name,
-        rawNotes,
-        maxNumNotes,
-        notes = [],
-        noteProperties,
-        note,
-        i,
-        clip = this._clip;
+  CS.Ableton.Clip.prototype.fetch_notes = function () {
+    var name,
+      rawNotes,
+      maxNumNotes,
+      notes = [],
+      noteProperties,
+      note,
+      i,
+      clip = this._clip;
 
 
-      if (Number(clip.id) === 0) {
-        // no clip was present
-        return false;
-      }
-
-      name = clip.get("name");
-
-      /*post("\n--------\nAnalyzing: " + name + "\n--------\n");*/
-     
-      //post("calling `select_all_notes`\n");
-      clip.call("select_all_notes");
-
-      //post("calling `get_selected_notes`\n");
-      rawNotes = clip.call("get_selected_notes");
-      
-      // grab maxNumNotes
-      if (rawNotes[0] !== "notes") {
-        post("Unexpected note output!\n");
-        return;
-      }
-
-      // this is the maximum number of notes because Ableton doesn't report
-      // accurate data especially when there is a large amount of notes
-      // in the clip.
-      maxNumNotes = rawNotes[1];
-
-      // remove maxNumNotes
-      rawNotes = rawNotes.slice(2);
-
-      /*post("rawNotes.length:\n");
-      post(rawNotes.length);
-      post("\n");
-
-      post("maxNumNotes * 6:\n");
-      post(maxNumNotes * 6);
-      post("\n");*/
-
-      post("extracting notes\n");
-
-      for (i = 0; i < (maxNumNotes * 6); i += 6) {
-        // extract note properties from array given from Ableton
-        noteProperties = {
-          pitch: rawNotes[i + 1],
-          time: rawNotes[i + 2],
-          duration: rawNotes[i + 3],
-          velocity: rawNotes[i + 4],
-          muted: rawNotes[i + 5] === 1
-        };
-
-        // if this is a valid note
-        if (
-          rawNotes[i] === "note" &&
-            typeof(noteProperties.pitch) === "number" &&
-              typeof(noteProperties.time) === "number" &&
-                typeof(noteProperties.duration) === "number" &&
-                  typeof(noteProperties.velocity) === "number" &&
-                    typeof(noteProperties.muted) === "boolean"
-        ) {
-          note = new CS.PhraseNote(noteProperties);
-          notes.push(note);
-        }
-      }
-
-      if (notes.length !== maxNumNotes) {
-        post("Error parsing note data!\n\tGot " + notes.length + " notes but expected " + maxNumNotes + " notes.");
-        return;
-      }
-
-      //post("organizing notes...");
-
-      // sort notes by time
-      notes.sort(function (a, b) {
-        return (a.get("time") <= b.get("time")) ? -1 : 1;
-      });
-
-      return notes;
-      
+    if (Number(clip.id) === 0) {
+      // no clip was present
+      return false;
     }
-  
+
+   
+    //post("calling `select_all_notes`\n");
+    clip.call("select_all_notes");
+
+    //post("calling `get_selected_notes`\n");
+    rawNotes = clip.call("get_selected_notes");
+    
+    // grab maxNumNotes
+    if (rawNotes[0] !== "notes") {
+      post("Unexpected note output!\n");
+      return;
+    }
+
+    // this is the maximum number of notes because Ableton doesn't report
+    // accurate data especially when there is a large amount of notes
+    // in the clip.
+    maxNumNotes = rawNotes[1];
+
+    // remove maxNumNotes
+    rawNotes = rawNotes.slice(2);
+
+    /*post("rawNotes.length:\n");
+    post(rawNotes.length);
+    post("\n");
+
+    post("maxNumNotes * 6:\n");
+    post(maxNumNotes * 6);
+    post("\n");*/
+
+    post("extracting notes\n");
+
+    for (i = 0; i < (maxNumNotes * 6); i += 6) {
+      // extract note properties from array given from Ableton
+      noteProperties = {
+        pitch: rawNotes[i + 1],
+        time: rawNotes[i + 2],
+        duration: rawNotes[i + 3],
+        velocity: rawNotes[i + 4],
+        muted: rawNotes[i + 5] === 1
+      };
+
+      // if this is a valid note
+      if (
+        rawNotes[i] === "note" &&
+          typeof(noteProperties.pitch) === "number" &&
+            typeof(noteProperties.time) === "number" &&
+              typeof(noteProperties.duration) === "number" &&
+                typeof(noteProperties.velocity) === "number" &&
+                  typeof(noteProperties.muted) === "boolean"
+      ) {
+        note = new CS.PhraseNote(noteProperties);
+        notes.push(note);
+      }
+    }
+
+    if (notes.length !== maxNumNotes) {
+      post("Error parsing note data!\n\tGot " + notes.length + " notes but expected " + maxNumNotes + " notes.");
+      return;
+    }
+
+    //post("organizing notes...");
+
+    // sort notes by time
+    notes.sort(function (a, b) {
+      return (a.get("time") <= b.get("time")) ? -1 : 1;
+    });
+
+    return notes;
+    
   };
   
 }).call(this);
@@ -3761,7 +3759,8 @@ if (typeof exports !== "undefined" && exports !== null) {
       clipPath,
       clip,
       clipName,
-      me = this;
+      me = this,
+      process_clip_slot;
 
     
     /**
@@ -3771,9 +3770,19 @@ if (typeof exports !== "undefined" && exports !== null) {
     trackPath = this.track.path.slice(1, -1);
     clipSlots = this.track.get("clip_slots");
 
-    function process_clip_slot () {
+    /**
+     *  Process a single clip slot.
+     **/
+    process_clip_slot = error_aware_callback(function () {
+      post("this.id:\n");
+      post(this.id);
+      post("\n");
+      post("i:\n");
+      post(i);
+      post("\n");
       if (this.id !== "0") {
         clipName = this.get("name")[0];
+        post("\n--------\nProcessing: " + clipName + "\n--------\n");
        
         // create a CS.Ableton.Clip instance for each clip with a name
         // ending in a "-01" or such.
@@ -3791,28 +3800,40 @@ if (typeof exports !== "undefined" && exports !== null) {
           }));
         }
       }
-    }
 
-    // for each clip slot
+      i += 2;
+      if (i < clipSlots.length) {
+        clipSlotId = i / 2;
+        clipPath = trackPath + " clip_slots " + clipSlotId + " clip ";
+        this.path = clipPath;
+      } else {
+        // now all clips are instantiated, we can analyze.
+        for (i = 0; i < me.analysisClips.length; i++) {
+          clip = me.analysisClips[i];
+          me.analyzer.incorporate_phrase(clip.phrase);
+        }
+
+        // initiate auto-generation if it was toggled before track was analyzed
+        me.set_autogen(me.autoGenerateClips);
+
+        me.trackWasAnalyzed = true;
+        status_message(me.analysisClips.length + " clips were analyzed.");
+      
+      }
+    });
+
+    i = 0;
+    clipSlotId = i / 2;
+    clipPath = trackPath + " clip_slots " + clipSlotId + " clip ";
+    clip = new LiveAPI(process_clip_slot, clipPath);
+
+    /*// for each clip slot
     for (i = 0; i < clipSlots.length; i += 2) {
-      clipSlotId = i / 2;
-      clipPath = trackPath + " clip_slots " + clipSlotId + " clip ";
 
       clip = new LiveAPI(process_clip_slot, clipPath);
 
-    }
+    }*/
 
-    // now all clips are instantiated, we can analyze.
-    for (i = 0; i < this.analysisClips.length; i++) {
-      clip = this.analysisClips[i];
-      this.analyzer.incorporate_phrase(clip.phrase);
-    }
-
-    // initiate auto-generation if it was toggled before track was analyzed
-    this.set_autogen(this.autoGenerateClips);
-
-    this.trackWasAnalyzed = true;
-    status_message(this.analysisClips.length + " clips were analyzed.");
   };
 
   /**
