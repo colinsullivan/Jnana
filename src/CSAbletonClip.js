@@ -47,6 +47,8 @@
 
 
     CS.Phrase.call(this, params);
+    post("Hello\n");
+
 
     /**
      *  Keep track of loop length as it was originally.  Useful when generating

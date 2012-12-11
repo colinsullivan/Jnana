@@ -98,6 +98,17 @@
   };
 
   /**
+   *  Because the Max for Live API is weird, this "class" must act as a
+   *  delegate anytime another component wants a new `LiveAPI` instance.
+   *
+   *  @param  String  path    The `path` argument to send to the `LiveAPI`
+   *  constructor.
+   **/
+  this.new_live_api = function (path) {
+    return new LiveAPI(path);
+  };
+
+  /**
    *  Called from UI when analyze button is pressed.
    **/
   this.analyze_track = function () {
@@ -124,6 +135,12 @@
      *  Process a single clip slot.
      **/
     process_clip_slot = error_aware_callback(function () {
+      post("this.id:\n");
+      post(this.id);
+      post("\n");
+      post("i:\n");
+      post(i);
+      post("\n");
       if (this.id !== "0") {
         clipName = this.get("name")[0];
         post("\n--------\nProcessing: " + clipName + "\n--------\n");
@@ -154,7 +171,7 @@
         // now all clips are instantiated, we can analyze.
         for (i = 0; i < me.analysisClips.length; i++) {
           clip = me.analysisClips[i];
-          me.analyzer.incorporate_phrase(clip);
+          me.analyzer.incorporate_phrase(clip.phrase);
         }
 
         // initiate auto-generation if it was toggled before track was analyzed
