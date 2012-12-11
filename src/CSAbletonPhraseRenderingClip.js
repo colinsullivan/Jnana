@@ -7,7 +7,7 @@
  *              Licensed under the GPLv3 license.
  **/
 
-/*global post, Task */
+/*global Task */
 
 (function () {
   "use strict";
@@ -133,13 +133,14 @@
     moveEndMarker = params.moveEndMarker;
 
     if (phrase.duration === 0) {
-      post("Warning: Phrase duration was 0...skipping");
+      CS.post("Warning: Phrase duration was 0...skipping");
       return;
     }
 
     tEnd = tStart + phrase.duration;
     notes = phrase.notes();
 
+    CS.post("inserting phrase\n");
     clip.call("deselect_all_notes");
     clip.call("replace_selected_notes");
     clip.call("notes", notes.length);
@@ -155,37 +156,38 @@
       ]);
     }
     clip.call("done");
+    CS.post("done inserting phrase\n");
 
-    //post("moving loop markers...\n");
+    CS.post("moving loop markers...\n");
     if (moveEndMarker) {
       // move clip end and clip start to boundaries of newly generated clip.
-      //post("\tlooping 0\n");
+      //CS.post("\tlooping 0\n");
       clip.set("looping", 0);
-      //post("\tloop_end " + tEnd.toFixed(3) + "\n");
+      //CS.post("\tloop_end " + tEnd.toFixed(3) + "\n");
       clip.set("loop_end", tEnd.toFixed(3));
-      //post("\tlooping 1\n");
+      //CS.post("\tlooping 1\n");
       clip.set("looping", 1);
-      //post("\tloop_end " + tEnd.toFixed(3) + "\n");
+      //CS.post("\tloop_end " + tEnd.toFixed(3) + "\n");
       clip.set("loop_end", tEnd.toFixed(3));
       this._currentLoopEndTime = tEnd;
     }
    
     if (moveStartMarker) {
       // move loop start and loop end to boundaries of newly generated clip
-      //post("\tlooping 0\n");
+      //CS.post("\tlooping 0\n");
       clip.set("looping", 0);
-      //post("\tloop_start " + tStart.toFixed(3) + "\n");
+      //CS.post("\tloop_start " + tStart.toFixed(3) + "\n");
       clip.set("loop_start", tStart.toFixed(3));
-      //post("\tlooping 1\n");
+      //CS.post("\tlooping 1\n");
       clip.set("looping", 1);
-      //post("\tloop_start " + tStart.toFixed(3) + "\n");
+      //CS.post("\tloop_start " + tStart.toFixed(3) + "\n");
       clip.set("loop_start", tStart.toFixed(3));
     }
 
 
     clip.set("looping", loopingOn);
 
-    //post("done moving loop markers...\n");
+    CS.post("done moving loop markers...\n");
     
   };
 
@@ -354,7 +356,7 @@
       isPlaying = clip.get("is_playing")[0] === 1,
       isTriggered = clip.get("is_triggered")[0] === 1;
 
-    post("handling state change...\n");
+    CS.post("handling state change...\n");
     if (
       // if clip was playing and is now stopped
       currentState === clipStates.PLAYING && !isPlaying
@@ -391,7 +393,7 @@
       this._clipState = clipStates.TRIGGERED;
     
     }
-    post("done handling state change...\n");
+    CS.post("done handling state change...\n");
   };
 
   CS.Ableton.SelfGeneratingClip.prototype.generate_and_append = function () {
@@ -407,7 +409,7 @@
     // keep track of amount of plays since the last generate
     this._playsSinceLastGenerate++;
 
-    post("clip finished...\n");
+    CS.post("clip finished...\n");
 
     // if the clip is stopped
     if (

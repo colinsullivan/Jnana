@@ -10,16 +10,14 @@
 (function () {
   "use strict";
 
-  var CS, root = this, post;
+  var CS, root = this;
 
   if (typeof require !== "undefined" && require !== null) {
     CS = require("./CS.js").CS;
     require("./CSPhraseNote.js");
     this._ = require("./vendor/underscore.js")._;
-    post = console.log;
   } else {
     CS = this.CS;
-    post = this.post;
   }
   
   /**
@@ -48,9 +46,9 @@
         lastNote = this._notes[this._notes.length - 1];
 
         this.duration = lastNote.get("time") + lastNote.get("duration");
-        post("this.duration:\n");
-        post(this.duration);
-        post("\n");
+        CS.post("this.duration:\n");
+        CS.post(this.duration);
+        CS.post("\n");
       }
     } else {
       // assume user of API knows duration of phrase

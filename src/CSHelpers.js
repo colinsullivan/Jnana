@@ -13,9 +13,9 @@ var print_object = function (obj) {
   var key;
 
   for (key in obj) {
-    post("obj[" + key + "]:\n");
-    post(obj[key]);
-    post("\n");   
+    CS.post("obj[" + key + "]:\n");
+    CS.post(obj[key]);
+    CS.post("\n");   
   }
 };
 

@@ -13,10 +13,25 @@
   "use strict";
 
 
-  this.CS = {
+  var CS,
+    post;
+
+  if (typeof require !== "undefined" && require !== null) {
+    post = console.log;
+  } else {
+    post = this.post;
+  }
+  
+  CS = this.CS = {
+    DEBUG: false,
     Ableton: {}
   };
-
+  
+  CS.post = function (msg) {
+    if (CS.DEBUG) {
+      post(msg);
+    }
+  };
 
 }).call(this);
 //     Underscore.js 1.4.2
@@ -1234,9 +1249,9 @@ var print_object = function (obj) {
   var key;
 
   for (key in obj) {
-    post("obj[" + key + "]:\n");
-    post(obj[key]);
-    post("\n");   
+    CS.post("obj[" + key + "]:\n");
+    CS.post(obj[key]);
+    CS.post("\n");   
   }
 };
 
@@ -1352,16 +1367,14 @@ if (typeof exports !== "undefined" && exports !== null) {
 (function () {
   "use strict";
 
-  var CS, root = this, post;
+  var CS, root = this;
 
   if (typeof require !== "undefined" && require !== null) {
     CS = require("./CS.js").CS;
     require("./CSPhraseNote.js");
     this._ = require("./vendor/underscore.js")._;
-    post = console.log;
   } else {
     CS = this.CS;
-    post = this.post;
   }
   
   /**
@@ -1390,9 +1403,9 @@ if (typeof exports !== "undefined" && exports !== null) {
         lastNote = this._notes[this._notes.length - 1];
 
         this.duration = lastNote.get("time") + lastNote.get("duration");
-        post("this.duration:\n");
-        post(this.duration);
-        post("\n");
+        CS.post("this.duration:\n");
+        CS.post(this.duration);
+        CS.post("\n");
       }
     } else {
       // assume user of API knows duration of phrase
@@ -1468,8 +1481,6 @@ if (typeof exports !== "undefined" && exports !== null) {
  *              Licensed under the GPLv3 license.
  **/
 
-/*global post */
-
 (function () {
   "use strict";
 
@@ -1537,17 +1548,17 @@ if (typeof exports !== "undefined" && exports !== null) {
 
       name = clip.get("name");
 
-      /*post("\n--------\nAnalyzing: " + name + "\n--------\n");*/
+      CS.post("\n--------\nFetching: " + name + "\n--------\n");
      
-      //post("calling `select_all_notes`\n");
+      CS.post("calling `select_all_notes`\n");
       clip.call("select_all_notes");
 
-      //post("calling `get_selected_notes`\n");
+      CS.post("calling `get_selected_notes`\n");
       rawNotes = clip.call("get_selected_notes");
       
       // grab maxNumNotes
       if (rawNotes[0] !== "notes") {
-        post("Unexpected note output!\n");
+        CS.post("Unexpected note output!\n");
         return;
       }
 
@@ -1559,15 +1570,15 @@ if (typeof exports !== "undefined" && exports !== null) {
       // remove maxNumNotes
       rawNotes = rawNotes.slice(2);
 
-      /*post("rawNotes.length:\n");
-      post(rawNotes.length);
-      post("\n");
+      CS.post("rawNotes.length:\n");
+      CS.post(rawNotes.length);
+      CS.post("\n");
 
-      post("maxNumNotes * 6:\n");
-      post(maxNumNotes * 6);
-      post("\n");*/
+      CS.post("maxNumNotes * 6:\n");
+      CS.post(maxNumNotes * 6);
+      CS.post("\n");
 
-      post("extracting notes\n");
+      CS.post("extracting notes\n");
 
       for (i = 0; i < (maxNumNotes * 6); i += 6) {
         // extract note properties from array given from Ableton
@@ -1594,11 +1605,11 @@ if (typeof exports !== "undefined" && exports !== null) {
       }
 
       if (notes.length !== maxNumNotes) {
-        post("Error parsing note data!\n\tGot " + notes.length + " notes but expected " + maxNumNotes + " notes.");
+        CS.post("Error parsing note data!\n\tGot " + notes.length + " notes but expected " + maxNumNotes + " notes.");
         return;
       }
 
-      //post("organizing notes...");
+      CS.post("organizing notes...");
 
       // sort notes by time
       notes.sort(function (a, b) {
@@ -1610,7 +1621,7 @@ if (typeof exports !== "undefined" && exports !== null) {
     }
   
   };
-  
+
 }).call(this);
 /**
  *  @file       CSProbabilityVector.js
@@ -1838,10 +1849,6 @@ if (typeof exports !== "undefined" && exports !== null) {
   
   var CS, root = this;
 
-  if (typeof this.post === "undefined" || this.post === null) {
-    this.post = console.log;
-  }
-  
   if (typeof require !== "undefined" && require !== null) {
     CS = require("./CS.js").CS;
     require("./CSMarkovTableRow.js");
@@ -2029,32 +2036,31 @@ if (typeof exports !== "undefined" && exports !== null) {
      **/
     print: function () {
       var i, key, row, prob,
-        columnSpacer = "\t\t\t\t\t\t",
-        post = root.post;
+        columnSpacer = "\t\t\t\t\t\t";
 
-      post("\n--------\nCSMarkovTable Contents:\n--------\n");
+      CS.post("\n--------\nCSMarkovTable Contents:\n--------\n");
       // column headers
-      post("\t\t\t\t\t\t\t\t\t\t\t\t\t" + columnSpacer);
+      CS.post("\t\t\t\t\t\t\t\t\t\t\t\t\t" + columnSpacer);
       for (i = 0; i < this._destStates.length; i++) {
-        post(this._destStates[i] + columnSpacer + "\t\t\t\t\t");
+        CS.post(this._destStates[i] + columnSpacer + "\t\t\t\t\t");
       }
-      post("\n");
+      CS.post("\n");
 
       // rows
       for (key in this._rows) {
-        post(key);
+        CS.post(key);
 
         row = this._rows[key];
 
         for (i = 0; i < this._destStates.length; i++) {
           prob = row._probabilities[this._destStates[i]];
-          post(columnSpacer + prob.toFixed(2) + "\t\t");
+          CS.post(columnSpacer + prob.toFixed(2) + "\t\t");
         }
 
-        post("\n");
+        CS.post("\n");
       }
 
-      post("\n--------\n");
+      CS.post("\n--------\n");
     }
   };
 
@@ -2073,14 +2079,12 @@ if (typeof exports !== "undefined" && exports !== null) {
 (function () {
   "use strict";
 
-  var CS, root = this, post;
+  var CS, root = this;
   if (typeof require !== "undefined" && require !== null) {
     CS = require("./CS.js").CS;
     root._ = require("./vendor/underscore.js")._;
-    post = console.log;
   } else {
     CS = this.CS;
-    post = this.post;
   }
 
   CS.MarkovStateMachine = function (params) {
@@ -2138,11 +2142,11 @@ if (typeof exports !== "undefined" && exports !== null) {
       }
 
       if (useStartingAnalysis) {
-        post("generating using starting analysis\n");
+        CS.post("generating using starting analysis\n");
         startingRowKey = table._startingStates.choose_column();
         startingRow = table._rows[startingRowKey];
       } else {
-        post("generating without starting analysis\n");
+        CS.post("generating without starting analysis\n");
         // choose a random starting row in the table
         startingRow = table._rowsList[_.random(table._rowsList.length - 1)];
       }
@@ -2323,8 +2327,7 @@ if (typeof exports !== "undefined" && exports !== null) {
 
   var CS,
     _,
-    root = this,
-    post;
+    root = this;
   if (typeof require !== "undefined" && require !== null) {
     CS = require("./CS.js").CS;
     require("./CSMarkovMultiStateMachine.js");
@@ -2546,11 +2549,11 @@ if (typeof exports !== "undefined" && exports !== null) {
     }
 
     /*var keys = root._.keys(pitchTable._startingStates._probabilities);
-    post("Starting probabilities:\n");
+    CS.post("Starting probabilities:\n");
     for (i = 0; i < keys.length; i++) {
-      post(keys[i] + ": " + pitchTable._startingStates._probabilities[keys[i]] + "\n");
+      CS.post(keys[i] + ": " + pitchTable._startingStates._probabilities[keys[i]] + "\n");
     }
-    post("\n\n");*/
+    CS.post("\n\n");*/
   };
 
 }).call(this);
@@ -2567,17 +2570,15 @@ if (typeof exports !== "undefined" && exports !== null) {
 (function () {
   "use strict";
 
-  var CS, _, root = this, post;
+  var CS, _, root = this;
   if (typeof require !== "undefined" && require !== null) {
     CS = require("./CS.js").CS;
     require("./CSMarkovMultiStateMachine.js");
     require("./CSMarkovTable.js");
     root._ = require("./vendor/underscore.js")._;
-    post = console.log;
   } else {
     CS = this.CS;
     _ = this._;
-    post = this.post;
   }
 
   /**
@@ -2631,12 +2632,12 @@ if (typeof exports !== "undefined" && exports !== null) {
         this._useCircular = shouldUseCircular;
 
         if (shouldUseCircular) {
-          post("using circular table\n");
+          CS.post("using circular table\n");
           this._stateMachine.switch_table("pitch", this._phraseAnalyzer._circularPitchTable);
           this._stateMachine.switch_table("duration", this._phraseAnalyzer._circularDurationTable);
           this._stateMachine.switch_table("velocity", this._phraseAnalyzer._circularVelocityTable);
         } else {
-          post("using un-circular table\n");
+          CS.post("using un-circular table\n");
           this._stateMachine.switch_table("pitch", this._phraseAnalyzer._pitchTable);
           this._stateMachine.switch_table("duration", this._phraseAnalyzer._durationTable);
           this._stateMachine.switch_table("velocity", this._phraseAnalyzer._velocityTable);
@@ -2729,7 +2730,7 @@ if (typeof exports !== "undefined" && exports !== null) {
  *              Licensed under the GPLv3 license.
  **/
 
-/*global post, Task */
+/*global Task */
 
 (function () {
   "use strict";
@@ -2855,13 +2856,14 @@ if (typeof exports !== "undefined" && exports !== null) {
     moveEndMarker = params.moveEndMarker;
 
     if (phrase.duration === 0) {
-      post("Warning: Phrase duration was 0...skipping");
+      CS.post("Warning: Phrase duration was 0...skipping");
       return;
     }
 
     tEnd = tStart + phrase.duration;
     notes = phrase.notes();
 
+    CS.post("inserting phrase\n");
     clip.call("deselect_all_notes");
     clip.call("replace_selected_notes");
     clip.call("notes", notes.length);
@@ -2877,37 +2879,38 @@ if (typeof exports !== "undefined" && exports !== null) {
       ]);
     }
     clip.call("done");
+    CS.post("done inserting phrase\n");
 
-    //post("moving loop markers...\n");
+    CS.post("moving loop markers...\n");
     if (moveEndMarker) {
       // move clip end and clip start to boundaries of newly generated clip.
-      //post("\tlooping 0\n");
+      //CS.post("\tlooping 0\n");
       clip.set("looping", 0);
-      //post("\tloop_end " + tEnd.toFixed(3) + "\n");
+      //CS.post("\tloop_end " + tEnd.toFixed(3) + "\n");
       clip.set("loop_end", tEnd.toFixed(3));
-      //post("\tlooping 1\n");
+      //CS.post("\tlooping 1\n");
       clip.set("looping", 1);
-      //post("\tloop_end " + tEnd.toFixed(3) + "\n");
+      //CS.post("\tloop_end " + tEnd.toFixed(3) + "\n");
       clip.set("loop_end", tEnd.toFixed(3));
       this._currentLoopEndTime = tEnd;
     }
    
     if (moveStartMarker) {
       // move loop start and loop end to boundaries of newly generated clip
-      //post("\tlooping 0\n");
+      //CS.post("\tlooping 0\n");
       clip.set("looping", 0);
-      //post("\tloop_start " + tStart.toFixed(3) + "\n");
+      //CS.post("\tloop_start " + tStart.toFixed(3) + "\n");
       clip.set("loop_start", tStart.toFixed(3));
-      //post("\tlooping 1\n");
+      //CS.post("\tlooping 1\n");
       clip.set("looping", 1);
-      //post("\tloop_start " + tStart.toFixed(3) + "\n");
+      //CS.post("\tloop_start " + tStart.toFixed(3) + "\n");
       clip.set("loop_start", tStart.toFixed(3));
     }
 
 
     clip.set("looping", loopingOn);
 
-    //post("done moving loop markers...\n");
+    CS.post("done moving loop markers...\n");
     
   };
 
@@ -3076,7 +3079,7 @@ if (typeof exports !== "undefined" && exports !== null) {
       isPlaying = clip.get("is_playing")[0] === 1,
       isTriggered = clip.get("is_triggered")[0] === 1;
 
-    post("handling state change...\n");
+    CS.post("handling state change...\n");
     if (
       // if clip was playing and is now stopped
       currentState === clipStates.PLAYING && !isPlaying
@@ -3113,7 +3116,7 @@ if (typeof exports !== "undefined" && exports !== null) {
       this._clipState = clipStates.TRIGGERED;
     
     }
-    post("done handling state change...\n");
+    CS.post("done handling state change...\n");
   };
 
   CS.Ableton.SelfGeneratingClip.prototype.generate_and_append = function () {
@@ -3129,7 +3132,7 @@ if (typeof exports !== "undefined" && exports !== null) {
     // keep track of amount of plays since the last generate
     this._playsSinceLastGenerate++;
 
-    post("clip finished...\n");
+    CS.post("clip finished...\n");
 
     // if the clip is stopped
     if (
@@ -3193,19 +3196,16 @@ if (typeof exports !== "undefined" && exports !== null) {
   "use strict";
 
   var CS,
-    Task,
-    post;
+    Task;
 
 
   if (typeof require !== "undefined" && require !== null) {
     CS = require("./lib/CS.js").CS;
     require("./lib/CSPhraseNote.js");
     require("./lib/CSPhrase.js");
-    post = console.log;
   } else {
     CS = this.CS;
     Task = this.Task;
-    post = this.post;
   }
 
   /**
@@ -3332,7 +3332,7 @@ if (typeof exports !== "undefined" && exports !== null) {
           this._endOfPhraseCallback = new Task(function () {
             var phrase;
 
-            post("phrase ended\n");
+            CS.post("phrase ended\n");
 
             phrase = new CS.Phrase({
               notes: this._currentPhraseNotes
@@ -3349,7 +3349,7 @@ if (typeof exports !== "undefined" && exports !== null) {
             this.handle_phrase_ended(phrase);
 
           }, this);
-          post("starting endOfPhraseCallback\n");
+          CS.post("starting endOfPhraseCallback\n");
           this._endOfPhraseCallback.schedule(this._phraseTimeoutDuration);
         }
 
@@ -3381,15 +3381,12 @@ if (typeof exports !== "undefined" && exports !== null) {
 (function () {
   "use strict";
 
-  var CS,
-    post;
+  var CS;
   
   if (typeof require !== "undefined" && require !== null) {
     CS = require("./lib/CS.js").CS;
-    post = console.log;
   } else {
     CS = this.CS;
-    post = this.post;
   }
 
   /**
@@ -3579,7 +3576,7 @@ if (typeof exports !== "undefined" && exports !== null) {
       duration = 4 * 4,
       final_callback = function () {
         // play first clip
-        post("firing first clip");
+        CS.post("firing first clip");
         genClips[0]._clip.call("fire");
       },
       generate_with_callback = function (genClip, callback) {

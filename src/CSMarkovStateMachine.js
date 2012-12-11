@@ -10,14 +10,12 @@
 (function () {
   "use strict";
 
-  var CS, root = this, post;
+  var CS, root = this;
   if (typeof require !== "undefined" && require !== null) {
     CS = require("./CS.js").CS;
     root._ = require("./vendor/underscore.js")._;
-    post = console.log;
   } else {
     CS = this.CS;
-    post = this.post;
   }
 
   CS.MarkovStateMachine = function (params) {
@@ -75,11 +73,11 @@
       }
 
       if (useStartingAnalysis) {
-        post("generating using starting analysis\n");
+        CS.post("generating using starting analysis\n");
         startingRowKey = table._startingStates.choose_column();
         startingRow = table._rows[startingRowKey];
       } else {
-        post("generating without starting analysis\n");
+        CS.post("generating without starting analysis\n");
         // choose a random starting row in the table
         startingRow = table._rowsList[_.random(table._rowsList.length - 1)];
       }

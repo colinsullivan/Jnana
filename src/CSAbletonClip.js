@@ -7,8 +7,6 @@
  *              Licensed under the GPLv3 license.
  **/
 
-/*global post */
-
 (function () {
   "use strict";
 
@@ -76,17 +74,17 @@
 
       name = clip.get("name");
 
-      /*post("\n--------\nAnalyzing: " + name + "\n--------\n");*/
+      CS.post("\n--------\nFetching: " + name + "\n--------\n");
      
-      //post("calling `select_all_notes`\n");
+      CS.post("calling `select_all_notes`\n");
       clip.call("select_all_notes");
 
-      //post("calling `get_selected_notes`\n");
+      CS.post("calling `get_selected_notes`\n");
       rawNotes = clip.call("get_selected_notes");
       
       // grab maxNumNotes
       if (rawNotes[0] !== "notes") {
-        post("Unexpected note output!\n");
+        CS.post("Unexpected note output!\n");
         return;
       }
 
@@ -98,15 +96,15 @@
       // remove maxNumNotes
       rawNotes = rawNotes.slice(2);
 
-      /*post("rawNotes.length:\n");
-      post(rawNotes.length);
-      post("\n");
+      CS.post("rawNotes.length:\n");
+      CS.post(rawNotes.length);
+      CS.post("\n");
 
-      post("maxNumNotes * 6:\n");
-      post(maxNumNotes * 6);
-      post("\n");*/
+      CS.post("maxNumNotes * 6:\n");
+      CS.post(maxNumNotes * 6);
+      CS.post("\n");
 
-      post("extracting notes\n");
+      CS.post("extracting notes\n");
 
       for (i = 0; i < (maxNumNotes * 6); i += 6) {
         // extract note properties from array given from Ableton
@@ -133,11 +131,11 @@
       }
 
       if (notes.length !== maxNumNotes) {
-        post("Error parsing note data!\n\tGot " + notes.length + " notes but expected " + maxNumNotes + " notes.");
+        CS.post("Error parsing note data!\n\tGot " + notes.length + " notes but expected " + maxNumNotes + " notes.");
         return;
       }
 
-      //post("organizing notes...");
+      CS.post("organizing notes...");
 
       // sort notes by time
       notes.sort(function (a, b) {
@@ -149,5 +147,5 @@
     }
   
   };
-  
+
 }).call(this);

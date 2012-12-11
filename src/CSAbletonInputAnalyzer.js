@@ -10,15 +10,12 @@
 (function () {
   "use strict";
 
-  var CS,
-    post;
+  var CS;
   
   if (typeof require !== "undefined" && require !== null) {
     CS = require("./lib/CS.js").CS;
-    post = console.log;
   } else {
     CS = this.CS;
-    post = this.post;
   }
 
   /**
@@ -208,7 +205,7 @@
       duration = 4 * 4,
       final_callback = function () {
         // play first clip
-        post("firing first clip");
+        CS.post("firing first clip");
         genClips[0]._clip.call("fire");
       },
       generate_with_callback = function (genClip, callback) {

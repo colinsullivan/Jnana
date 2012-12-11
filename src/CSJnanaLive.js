@@ -10,7 +10,7 @@
  *              Licensed under the GPLv3 license.
  **/
 
-/*global LiveAPI, post, error_aware_callback, Task, outlet, CS */
+/*global LiveAPI, error_aware_callback, Task, outlet, CS */
 
 (function () {
   "use strict";

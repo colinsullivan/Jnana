@@ -47,7 +47,7 @@ all: ${BUILD_JSEXT}/CS.js ${BUILD_JSEXT}/CSJnanaLive.js ${BUILD_JSEXT}/CSJnanaCl
 #		Concatenates javascript files in the above list ./build/CS.js in the same
 #		order.
 ###
-${BUILD_JSEXT}/CS.js: ${CS_LIB_PATHS}
+${BUILD_JSEXT}/CS.js: ${SRC_DIR}/CS.js ${CS_LIB_PATHS}
 	cp ${SRC_DIR}/CS.js ${BUILD_JSEXT}/CS.js
 	for csdep in ${CS_LIB_PATHS}; do \
 		cat $$csdep >> $@; \

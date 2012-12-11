@@ -12,8 +12,7 @@
 
   var CS,
     _,
-    root = this,
-    post;
+    root = this;
   if (typeof require !== "undefined" && require !== null) {
     CS = require("./CS.js").CS;
     require("./CSMarkovMultiStateMachine.js");
@@ -235,11 +234,11 @@
     }
 
     /*var keys = root._.keys(pitchTable._startingStates._probabilities);
-    post("Starting probabilities:\n");
+    CS.post("Starting probabilities:\n");
     for (i = 0; i < keys.length; i++) {
-      post(keys[i] + ": " + pitchTable._startingStates._probabilities[keys[i]] + "\n");
+      CS.post(keys[i] + ": " + pitchTable._startingStates._probabilities[keys[i]] + "\n");
     }
-    post("\n\n");*/
+    CS.post("\n\n");*/
   };
 
 }).call(this);

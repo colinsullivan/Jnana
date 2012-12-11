@@ -7,7 +7,7 @@
  *              Licensed under the GPLv3 license.
  **/
 
-/*global LiveAPI, post, CS, error_aware_callback, Task, outlet */
+/*global LiveAPI, CS, error_aware_callback, Task, outlet */
 
 (function () {
   "use strict";
@@ -170,28 +170,6 @@
     this.trackWasAnalyzed = true;
     status_message(this.analysisClips.length + " clips were analyzed.");
 
-
-    /*var track,
-      trackAnalyzer,
-      me = this,
-      numClipsAnalyzed;
-
-
-    track = new LiveAPI(error_aware_callback(function () {
-      post("analyzing track '" + this.get("name") + "'\n");
-      
-      me.trackAnalyzer = trackAnalyzer = new TrackAnalyzer({
-        track: this
-      });
-
-      numClipsAnalyzed = trackAnalyzer.analyze();
-
-    }), "this_device canonical_parent");
-
-    if (!track) {
-      post("no track object!\n");
-      return;
-    }*/
   };
 
   /**

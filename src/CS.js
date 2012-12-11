@@ -13,9 +13,24 @@
   "use strict";
 
 
-  this.CS = {
+  var CS,
+    post;
+
+  if (typeof require !== "undefined" && require !== null) {
+    post = console.log;
+  } else {
+    post = this.post;
+  }
+  
+  CS = this.CS = {
+    DEBUG: false,
     Ableton: {}
   };
-
+  
+  CS.post = function (msg) {
+    if (CS.DEBUG) {
+      post(msg);
+    }
+  };
 
 }).call(this);

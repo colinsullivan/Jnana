@@ -11,19 +11,16 @@
   "use strict";
 
   var CS,
-    Task,
-    post;
+    Task;
 
 
   if (typeof require !== "undefined" && require !== null) {
     CS = require("./lib/CS.js").CS;
     require("./lib/CSPhraseNote.js");
     require("./lib/CSPhrase.js");
-    post = console.log;
   } else {
     CS = this.CS;
     Task = this.Task;
-    post = this.post;
   }
 
   /**
@@ -150,7 +147,7 @@
           this._endOfPhraseCallback = new Task(function () {
             var phrase;
 
-            post("phrase ended\n");
+            CS.post("phrase ended\n");
 
             phrase = new CS.Phrase({
               notes: this._currentPhraseNotes
@@ -167,7 +164,7 @@
             this.handle_phrase_ended(phrase);
 
           }, this);
-          post("starting endOfPhraseCallback\n");
+          CS.post("starting endOfPhraseCallback\n");
           this._endOfPhraseCallback.schedule(this._phraseTimeoutDuration);
         }
 

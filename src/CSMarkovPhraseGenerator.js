@@ -11,17 +11,15 @@
 (function () {
   "use strict";
 
-  var CS, _, root = this, post;
+  var CS, _, root = this;
   if (typeof require !== "undefined" && require !== null) {
     CS = require("./CS.js").CS;
     require("./CSMarkovMultiStateMachine.js");
     require("./CSMarkovTable.js");
     root._ = require("./vendor/underscore.js")._;
-    post = console.log;
   } else {
     CS = this.CS;
     _ = this._;
-    post = this.post;
   }
 
   /**
@@ -75,12 +73,12 @@
         this._useCircular = shouldUseCircular;
 
         if (shouldUseCircular) {
-          post("using circular table\n");
+          CS.post("using circular table\n");
           this._stateMachine.switch_table("pitch", this._phraseAnalyzer._circularPitchTable);
           this._stateMachine.switch_table("duration", this._phraseAnalyzer._circularDurationTable);
           this._stateMachine.switch_table("velocity", this._phraseAnalyzer._circularVelocityTable);
         } else {
-          post("using un-circular table\n");
+          CS.post("using un-circular table\n");
           this._stateMachine.switch_table("pitch", this._phraseAnalyzer._pitchTable);
           this._stateMachine.switch_table("duration", this._phraseAnalyzer._durationTable);
           this._stateMachine.switch_table("velocity", this._phraseAnalyzer._velocityTable);

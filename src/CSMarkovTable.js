@@ -12,10 +12,6 @@
   
   var CS, root = this;
 
-  if (typeof this.post === "undefined" || this.post === null) {
-    this.post = console.log;
-  }
-  
   if (typeof require !== "undefined" && require !== null) {
     CS = require("./CS.js").CS;
     require("./CSMarkovTableRow.js");
@@ -203,32 +199,31 @@
      **/
     print: function () {
       var i, key, row, prob,
-        columnSpacer = "\t\t\t\t\t\t",
-        post = root.post;
+        columnSpacer = "\t\t\t\t\t\t";
 
-      post("\n--------\nCSMarkovTable Contents:\n--------\n");
+      CS.post("\n--------\nCSMarkovTable Contents:\n--------\n");
       // column headers
-      post("\t\t\t\t\t\t\t\t\t\t\t\t\t" + columnSpacer);
+      CS.post("\t\t\t\t\t\t\t\t\t\t\t\t\t" + columnSpacer);
       for (i = 0; i < this._destStates.length; i++) {
-        post(this._destStates[i] + columnSpacer + "\t\t\t\t\t");
+        CS.post(this._destStates[i] + columnSpacer + "\t\t\t\t\t");
       }
-      post("\n");
+      CS.post("\n");
 
       // rows
       for (key in this._rows) {
-        post(key);
+        CS.post(key);
 
         row = this._rows[key];
 
         for (i = 0; i < this._destStates.length; i++) {
           prob = row._probabilities[this._destStates[i]];
-          post(columnSpacer + prob.toFixed(2) + "\t\t");
+          CS.post(columnSpacer + prob.toFixed(2) + "\t\t");
         }
 
-        post("\n");
+        CS.post("\n");
       }
 
-      post("\n--------\n");
+      CS.post("\n--------\n");
     }
   };
 
