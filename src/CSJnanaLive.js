@@ -124,47 +124,57 @@
     this.track = new LiveAPI("this_device canonical_parent");
     this.api = new LiveAPI("live_set");
 
-    this.inputAnalyzer = new CS.Ableton.InputAnalyzer({
-      track: this.track,
-      liveAPIDelegate: this,
-      shouldAutoRespond: this.shouldAutoRespond,
-      phraseTimeoutDuration: this.phraseTimeoutDuration,
-      auto_response_will_start_callback: function () {
-        
-        me.status_message_out("End of input phrase detected.");
-
-        previousShouldAutoTrain = me.shouldAutoTrain;
-
-        // stop auto-training while clip is playing
-        me.set_auto_train(false);
-        
-        // if user hasn't requested MIDI always passing through
-        if (!me.midiPassthroughAlways) {
-          // temporarily disarm track while clip is playing, otherwise
-          // any incoming MIDI would be sent through
-          me.set_track_armed(false);
+    try {
+      this.inputAnalyzer = new CS.Ableton.InputAnalyzer({
+        track: this.track,
+        liveAPIDelegate: this,
+        shouldAutoRespond: this.shouldAutoRespond,
+        phraseTimeoutDuration: this.phraseTimeoutDuration,
+        auto_response_will_start_callback: function () {
           
-          // allow midi to pass through so the clip can play
-          me.set_midi_passthrough(true);
-        }
-      },
-      auto_response_ended_callback: function () {
-        me.shouldAutoTrain = previousShouldAutoTrain;
-        // if user hasn't requested MIDI always passing through
-        if (!me.midiPassthroughAlways) {
+          me.status_message_out("End of input phrase detected.");
 
-          // disallow midi from passing through
-          me.set_midi_passthrough(false);
-        }
+          previousShouldAutoTrain = me.shouldAutoTrain;
 
-        // if we should still be listening to input
-        if (me.shouldAutoTrain) {
-          // re-arm track if it is disarmed
-          me.set_track_armed(true);
+          // stop auto-training while clip is playing
+          me.set_auto_train(false);
+          
+          // if user hasn't requested MIDI always passing through
+          if (!me.midiPassthroughAlways) {
+            // temporarily disarm track while clip is playing, otherwise
+            // any incoming MIDI would be sent through
+            me.set_track_armed(false);
+            
+            // allow midi to pass through so the clip can play
+            me.set_midi_passthrough(true);
+          }
+        },
+        auto_response_ended_callback: function () {
+          me.shouldAutoTrain = previousShouldAutoTrain;
+          // if user hasn't requested MIDI always passing through
+          if (!me.midiPassthroughAlways) {
+
+            // disallow midi from passing through
+            me.set_midi_passthrough(false);
+          }
+
+          // if we should still be listening to input
+          if (me.shouldAutoTrain) {
+            // re-arm track if it is disarmed
+            me.set_track_armed(true);
+          }
+          
         }
-        
+      });
+    
+    } catch (e) {
+      if (e.message.match(/^Error parsing note data!.*/)) { 
+        this.status_message_out("ERROR! An error occurred while parsing the clips.  Try emptying them.");
+      } else {
+        this.status_message_out("ERROR! An unknown error occurred.  Try starting fresh on a new track with empty clips.");
       }
-    });
+      return;
+    }
 
     // if state variables were set, it was done pre-initialization so
     // we should re-initialize
