@@ -231,7 +231,9 @@
     if (this.useCircularStatistics) {
       this.set_use_circular_statistics(this.useCircularStatistics);
     }
-
+    if (this.phraseTimeoutDuration) {
+      this.set_phrase_detection_timeout(this.phraseTimeoutDuration);
+    }
 
     // when track is stopped, re-enable training if flag was set
     this.trackStoppingWatcher = new LiveAPI(function () {
@@ -261,11 +263,9 @@
     }, this.track.path.slice(1, -1));
     this.trackStoppingWatcher.property = "playing_slot_index";
 
-    if (!this.shouldAutoTrain) {
-      this.status_message_out("Analysis is off.");
-    } else {
-      this.status_message_out("Auto training enabled.");
-    }
+    (new Task(function () {
+      this.status_message_out("Jnana ready.");
+    }, this)).schedule(1000);
 
   };
 
@@ -289,6 +289,8 @@
 
     if (this.inputAnalyzer) {
       this.inputAnalyzer.set_phraseTimeoutDuration(timeoutDuration);
+
+      this.status_message_out("Phrase detection timeout updated to " + timeoutDuration + " ms.");
     }
     
   };
@@ -463,6 +465,8 @@
    **/
   this.clear_training = function () {
     this.inputAnalyzer.clear_training();
+
+    this.status_message_out("Training cleared.");
   };
 
   /**
