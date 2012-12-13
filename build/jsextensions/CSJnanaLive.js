@@ -143,7 +143,8 @@
     // propogate message directly to user
     } else if (
       e.message.match(/^No `.*$/) ||
-        e.message === "`-manual` clips must all have the same clip duration!"
+        e.message === "`-manual` clips must all have the same clip duration!" ||
+          e.message === "No input has been analyzed yet!"
     ) {
       this.status_message_out("ERROR! " + e.message);
     } else {

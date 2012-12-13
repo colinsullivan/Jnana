@@ -246,6 +246,12 @@
       }
     }
 
+    // make sure phrase analyzer has analyzed at least something
+    if (this.phraseAnalyzer.numPhrasesAnalyzed === 0) {
+      throw new Error("No input has been analyzed yet!");
+    }
+
+
     // populate all `genClips` with notes, and play the first one
     generate_all_clips();
     

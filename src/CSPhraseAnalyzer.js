@@ -59,10 +59,9 @@
     this._circularVelocityTable   = new CS.MarkovTable(markovParams);
 
     /**
-     *  Statistics of beginning of phrase.  Basically a `MarkovTableRow` that
-     *  keeps track of which rows of the tables above have a higher
-     *  probability of being starting rows.
+     *  Geep track of the amount of phrases that were analyzed thus far.
      **/
+    this.numPhrasesAnalyzed = 0;
 
   };
 
@@ -232,6 +231,8 @@
           .concat(phraseVelocities.slice(0, wrapIndex))
       );
     }
+
+    this.numPhrasesAnalyzed++;
 
     /*var keys = root._.keys(pitchTable._startingStates._probabilities);
     CS.post("Starting probabilities:\n");
