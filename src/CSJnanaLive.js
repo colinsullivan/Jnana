@@ -137,6 +137,20 @@
     return new LiveAPI(path);
   };
 
+  this._handle_error = function (e) {
+    if (e.message.match(/^Error parsing note data!.*/)) { 
+      this.status_message_out("ERROR! An error occurred while parsing the clips.  Try emptying them.");
+    // propogate message directly to user
+    } else if (
+      e.message.match(/^No `.*$/) ||
+        e.message === "`-manual` clips must all have the same clip duration!"
+    ) {
+      this.status_message_out("ERROR! " + e.message);
+    } else {
+      this.status_message_out("ERROR! An unknown error occurred (" + e.message + ").  Try starting fresh on a new track with empty clips.");
+    }
+  };
+
   /**
    *  Called from max patch when patch is to be initialized.
    **/
@@ -192,13 +206,7 @@
       });
     
     } catch (e) {
-      if (e.message.match(/^Error parsing note data!.*/)) { 
-        this.status_message_out("ERROR! An error occurred while parsing the clips.  Try emptying them.");
-      } else if (e.message.match(/^No `.*$/)) {
-        this.status_message_out("ERROR! " + e.message);
-      } else {
-        this.status_message_out("ERROR! An unknown error occurred (" + e.message + ").  Try starting fresh on a new track with empty clips.");
-      }
+      this._handle_error(e);
       return;
     }
 
@@ -206,6 +214,9 @@
     // we should re-initialize
     if (this.trackIsArmed !== null) {
       this.set_track_armed(this.trackIsArmed);
+    }
+    if (this.shouldAutoTrain !== null) {
+      this.set_auto_train(this.shouldAutoTrain);
     }
     if (this.shouldAutoRespond) {
       this.set_auto_response(this.shouldAutoRespond);
@@ -358,7 +369,12 @@
 
 
     // generate manual clips and start playing first one
-    this.inputAnalyzer.start_manual_response();
+    try {
+      this.inputAnalyzer.start_manual_response();
+    } catch (e) {
+      this._handle_error(e);
+      return;
+    }
   
   };
 

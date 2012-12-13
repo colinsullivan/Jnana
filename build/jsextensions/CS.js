@@ -3580,7 +3580,7 @@ if (typeof exports !== "undefined" && exports !== null) {
     var i,
       genClips = this.genClips,
       genClip,
-      duration = 4 * 4,
+      duration = genClips[0]._clip.get("length")[0],
       final_callback = function () {
         // play first clip
         CS.post("firing first clip");
@@ -3605,6 +3605,12 @@ if (typeof exports !== "undefined" && exports !== null) {
         generate_with_callback(genClips[i], generate_callback);
       };
 
+    // make sure all clips have the same loop length
+    for (i = 0; i < genClips.length; i++) {
+      if (genClips[i]._clip.get("length")[0] !== duration) {
+        throw new Error("`-manual` clips must all have the same clip duration!");
+      }
+    }
 
     // populate all `genClips` with notes, and play the first one
     generate_all_clips();
