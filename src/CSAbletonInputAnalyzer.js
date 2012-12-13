@@ -72,6 +72,13 @@
     }
     this.auto_response_ended_callback = params.auto_response_ended_callback;
 
+    if (typeof params.input_phrase_ended_callback === "undefined" || params.input_phrase_ended_callback === null) {
+      params.input_phrase_ended_callback = function () {
+        
+      };
+    }
+    this.input_phrase_ended_callback = params.input_phrase_ended_callback;
+
     if (typeof params.track === "undefined" || params.track === null) {
       throw new Error("params.track is undefined");
     }
@@ -158,6 +165,8 @@
     var roundedPhraseDuration,
       autoGenClip = this.autoGenClip,
       me = this;
+
+    this.input_phrase_ended_callback();
 
     this.phraseAnalyzer.incorporate_phrase(phrase);
 

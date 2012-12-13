@@ -168,10 +168,10 @@
         liveAPIDelegate: this,
         shouldAutoRespond: this.shouldAutoRespond,
         phraseTimeoutDuration: this.phraseTimeoutDuration,
-        auto_response_will_start_callback: function () {
-          
+        input_phrase_ended_callback: function () {
           me.status_message_out("End of input phrase detected.");
-
+        },
+        auto_response_will_start_callback: function () {
           previousShouldAutoTrain = me.shouldAutoTrain;
 
           // stop auto-training while clip is playing
