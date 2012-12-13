@@ -169,8 +169,11 @@
         liveAPIDelegate: this,
         shouldAutoRespond: this.shouldAutoRespond,
         phraseTimeoutDuration: this.phraseTimeoutDuration,
-        input_phrase_ended_callback: function () {
-          me.status_message_out("End of input phrase detected.");
+        input_phrase_incorporated_callback: function () {
+          me.status_message_out("Input phrase successfully analyzed.");
+        },
+        input_phrase_ignored_callback: function () {
+          me.status_message_out("Input phrase too short for analysis, try lengthening the phrase detection timeout if you are playing melodies with long rests.");
         },
         auto_response_will_start_callback: function () {
           previousShouldAutoTrain = me.shouldAutoTrain;

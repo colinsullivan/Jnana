@@ -2387,7 +2387,11 @@ if (typeof exports !== "undefined" && exports !== null) {
   /**
    *  Incorporate an input phrase into the current analysis.
    *
-   *  @param  CS.Phrase  phrase   The phrase to incorporate.
+   *  @param  CS.Phrase   phrase   The phrase to incorporate.
+   *
+   *  @return Boolean     wether or not the incoming phrase was
+   *  successfully incorporated into the analysis, or false if
+   *  it was ignored.
    **/
   CS.PhraseAnalyzer.prototype.incorporate_phrase = function (phrase) {
     var phraseNotesWithRests,
@@ -2411,6 +2415,14 @@ if (typeof exports !== "undefined" && exports !== null) {
       _ = root._;
 
     phraseNotes = phrase.get_notes();
+
+    // if phrase was too short, we will ignore it
+    if (phraseNotes.length < order + 1) {
+
+      return false;
+
+    }
+
     phraseNotesWithRests = phrase.get_notes_with_rests();
 
     // convert note class to key-value data of attributes
@@ -2552,6 +2564,7 @@ if (typeof exports !== "undefined" && exports !== null) {
     }
 
     this.numPhrasesAnalyzed++;
+    return true;
 
     /*var keys = root._.keys(pitchTable._startingStates._probabilities);
     CS.post("Starting probabilities:\n");
@@ -3448,12 +3461,19 @@ if (typeof exports !== "undefined" && exports !== null) {
     }
     this.auto_response_ended_callback = params.auto_response_ended_callback;
 
-    if (typeof params.input_phrase_ended_callback === "undefined" || params.input_phrase_ended_callback === null) {
-      params.input_phrase_ended_callback = function () {
+    if (typeof params.input_phrase_incorporated_callback === "undefined" || params.input_phrase_incorporated_callback === null) {
+      params.input_phrase_incorporated_callback = function () {
         
       };
     }
-    this.input_phrase_ended_callback = params.input_phrase_ended_callback;
+    this.input_phrase_incorporated_callback = params.input_phrase_incorporated_callback;
+
+    if (typeof params.input_phrase_ignored_callback === "undefined" || params.input_phrase_ignored_callback === null) {
+      params.input_phrase_ignored_callback = function () {
+        
+      };
+    }
+    this.input_phrase_ignored_callback = params.input_phrase_ignored_callback;
 
     if (typeof params.track === "undefined" || params.track === null) {
       throw new Error("params.track is undefined");
@@ -3540,50 +3560,55 @@ if (typeof exports !== "undefined" && exports !== null) {
   CS.Ableton.InputAnalyzer.prototype.handle_phrase_ended = function (phrase) {
     var roundedPhraseDuration,
       autoGenClip = this.autoGenClip,
-      me = this;
-
-    this.input_phrase_ended_callback();
-
-    this.phraseAnalyzer.incorporate_phrase(phrase);
-
-    roundedPhraseDuration = Math.ceil(phrase.duration);
-
-    /**
-     *  If we are in auto response mode, and a phrase just ended,
-     *  initiate the auto response
-     **/
-    if (me.shouldAutoRespond) {
-      autoGenClip.generate_and_append_async(
-        // generate a response at a duration quantized from original
-        // phrase duration
-        roundedPhraseDuration,
-        // when clip is done generating, play it
-        function () {
+      me = this,
+      wasIncorporated;
 
 
-          // and when response is done playing
-          autoGenClip.set_playbackEndedCallback(function () {
-            autoGenClip.set_playbackEndedCallback(null);
-            autoGenClip.stop();
+    wasIncorporated = this.phraseAnalyzer.incorporate_phrase(phrase);
 
-            me.auto_response_ended_callback();
+    if (wasIncorporated) {
+      this.input_phrase_incorporated_callback();
+      
+      roundedPhraseDuration = Math.ceil(phrase.duration);
 
-          });
-          
-          me.auto_response_will_start_callback();
-          
-          autoGenClip.start();
-          
-          // but don't autogenerate
-          // TODO: fix this HACK.
-          autoGenClip._isAutogenerating = false;
+      /**
+       *  If we are in auto response mode, and a phrase just ended,
+       *  initiate the auto response
+       **/
+      if (me.shouldAutoRespond) {
+        autoGenClip.generate_and_append_async(
+          // generate a response at a duration quantized from original
+          // phrase duration
+          roundedPhraseDuration,
+          // when clip is done generating, play it
+          function () {
 
-          // play clip
-          autoGenClip._clip.call("fire");
-        }
-      );
+
+            // and when response is done playing
+            autoGenClip.set_playbackEndedCallback(function () {
+              autoGenClip.set_playbackEndedCallback(null);
+              autoGenClip.stop();
+
+              me.auto_response_ended_callback();
+
+            });
+            
+            me.auto_response_will_start_callback();
+            
+            autoGenClip.start();
+            
+            // but don't autogenerate
+            // TODO: fix this HACK.
+            autoGenClip._isAutogenerating = false;
+
+            // play clip
+            autoGenClip._clip.call("fire");
+          }
+        );
+      }
+    } else {
+      this.input_phrase_ignored_callback();
     }
-    
   };
 
   CS.Ableton.InputAnalyzer.prototype.start_manual_response = function () {

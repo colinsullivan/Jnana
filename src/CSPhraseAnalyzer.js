@@ -68,7 +68,11 @@
   /**
    *  Incorporate an input phrase into the current analysis.
    *
-   *  @param  CS.Phrase  phrase   The phrase to incorporate.
+   *  @param  CS.Phrase   phrase   The phrase to incorporate.
+   *
+   *  @return Boolean     wether or not the incoming phrase was
+   *  successfully incorporated into the analysis, or false if
+   *  it was ignored.
    **/
   CS.PhraseAnalyzer.prototype.incorporate_phrase = function (phrase) {
     var phraseNotesWithRests,
@@ -92,6 +96,14 @@
       _ = root._;
 
     phraseNotes = phrase.get_notes();
+
+    // if phrase was too short, we will ignore it
+    if (phraseNotes.length < order + 1) {
+
+      return false;
+
+    }
+
     phraseNotesWithRests = phrase.get_notes_with_rests();
 
     // convert note class to key-value data of attributes
@@ -233,6 +245,7 @@
     }
 
     this.numPhrasesAnalyzed++;
+    return true;
 
     /*var keys = root._.keys(pitchTable._startingStates._probabilities);
     CS.post("Starting probabilities:\n");
