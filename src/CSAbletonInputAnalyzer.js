@@ -133,10 +133,13 @@
       }
     }
 
-    if (this.genClips.length === 0) {
-      throw new Error("No generative clips found!");
+    if (typeof this.autoGenClip === "undefined" || this.autoGenClip === null) {
+      throw new Error("No `-auto` clip found!");
     }
-  
+    
+    if (this.genClips.length === 0) {
+      throw new Error("No `-manual` clips found!");
+    }
   };
 
   CS.Ableton.InputAnalyzer.prototype = new CS.InputAnalyzer();

@@ -133,7 +133,6 @@
       if (notes.length !== maxNumNotes) {
         CS.post("Error parsing note data!\n\tGot " + notes.length + " notes but expected " + maxNumNotes + " notes.");
         throw new Error("Error parsing note data!\n\tGot " + notes.length + " notes but expected " + maxNumNotes + " notes.");
-        return;
       }
 
       CS.post("organizing notes...");

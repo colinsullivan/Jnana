@@ -23,7 +23,7 @@
   }
   
   CS = this.CS = {
-    DEBUG: false,
+    DEBUG: true,
     Ableton: {}
   };
   
@@ -1607,7 +1607,6 @@ if (typeof exports !== "undefined" && exports !== null) {
       if (notes.length !== maxNumNotes) {
         CS.post("Error parsing note data!\n\tGot " + notes.length + " notes but expected " + maxNumNotes + " notes.");
         throw new Error("Error parsing note data!\n\tGot " + notes.length + " notes but expected " + maxNumNotes + " notes.");
-        return;
       }
 
       CS.post("organizing notes...");
@@ -3505,10 +3504,13 @@ if (typeof exports !== "undefined" && exports !== null) {
       }
     }
 
-    if (this.genClips.length === 0) {
-      throw new Error("No generative clips found!");
+    if (typeof this.autoGenClip === "undefined" || this.autoGenClip === null) {
+      throw new Error("No `-auto` clip found!");
     }
-  
+    
+    if (this.genClips.length === 0) {
+      throw new Error("No `-manual` clips found!");
+    }
   };
 
   CS.Ableton.InputAnalyzer.prototype = new CS.InputAnalyzer();

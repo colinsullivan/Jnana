@@ -170,8 +170,10 @@
     } catch (e) {
       if (e.message.match(/^Error parsing note data!.*/)) { 
         this.status_message_out("ERROR! An error occurred while parsing the clips.  Try emptying them.");
+      } else if (e.message.match(/^No `.*$/)) {
+        this.status_message_out("ERROR! " + e.message);
       } else {
-        this.status_message_out("ERROR! An unknown error occurred.  Try starting fresh on a new track with empty clips.");
+        this.status_message_out("ERROR! An unknown error occurred (" + e.message + ").  Try starting fresh on a new track with empty clips.");
       }
       return;
     }
@@ -324,6 +326,10 @@
       // enable midi passthrough just to let clip midi through
       this.set_midi_passthrough(true);
     }
+
+    // if session is not playing, it will be now
+    this.api.set("is_playing", true);
+
 
     // generate manual clips and start playing first one
     this.inputAnalyzer.start_manual_response();
