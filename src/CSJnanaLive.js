@@ -109,14 +109,20 @@
 
     this.shouldAutoRespond = newShouldAutoRespond;
 
-    // if auto_response is enabled, ableton needs to be playing incase it 
-    // needs to respond.
-    if (this.shouldAutoRespond) {
-      this._play_session_if_paused();
-    }
 
     if (this.inputAnalyzer) {
       this.inputAnalyzer.set_auto_response(newShouldAutoRespond);
+      
+      // if auto_response is enabled, ableton needs to be playing incase it 
+      // needs to respond.
+      if (this.shouldAutoRespond) {
+        this._play_session_if_paused();
+        this.status_message_out("Auto response enabled.");
+      } else {
+        this.status_message_out("Auto response disabled.");
+      }
+
+
     }
   };
 
@@ -296,8 +302,10 @@
     if (this.midiPassthroughAlways) {
       this.set_midi_passthrough(true);
       this.set_track_armed(true);
+      this.status_message_out("MIDI passthrough enabled.");
     } else if (prevMidiPassthroughAlways) {
       this.set_midi_passthrough(false);
+      this.status_message_out("MIDI passthrough disabled.");
     }
 
   };
@@ -424,6 +432,8 @@
       this.set_track_armed(true);
       this._play_session_if_paused();
       this.status_message_out("Auto training enabled.");
+    } else if (!this.shouldAutoTrain && this.track) {
+      this.status_message_out("Auto training disabled.");
     }
   };
 
@@ -449,6 +459,12 @@
     // if we've initialized
     if (this.inputAnalyzer) {
       this.inputAnalyzer.set_use_starting_statistics(this.useStartingStatistics);
+
+      if (this.useStartingStatistics) {
+        this.status_message_out("Starting statistics will be used when generating phrases from now on.");
+      } else {
+        this.status_message_out("Starting statistics will no longer be used when generating phrases.");
+      }
     }
   };
 
@@ -464,6 +480,12 @@
     // if we've already initialized our input analyzer
     if (this.inputAnalyzer) {
       this.inputAnalyzer.set_use_circular_statistics(this.useCircularStatistics);
+
+      if (this.useCircularStatistics) {
+        this.status_message_out("Circular phrases will be assumed when generating from now on.");
+      } else {
+        this.status_message_out("Circular phrases will no longer be assumed when generating.");
+      }
     }
   };
 
