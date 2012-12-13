@@ -58,11 +58,32 @@
     this._circularDurationTable   = new CS.MarkovTable(markovParams);
     this._circularVelocityTable   = new CS.MarkovTable(markovParams);
 
+    this._tables = [
+      this._pitchTable,
+      this._durationTable,
+      this._velocityTable,
+      this._circularPitchTable,
+      this._circularDurationTable,
+      this._circularVelocityTable
+    ];
+
     /**
      *  Geep track of the amount of phrases that were analyzed thus far.
      **/
     this.numPhrasesAnalyzed = 0;
 
+  };
+
+  CS.PhraseAnalyzer.prototype.clear_analysis = function () {
+    var i,
+      tables = this._tables;
+
+    this.numPhrasesAnalyzed = 0;
+
+    for (i = 0; i < tables.length; i++) {
+      tables[i].clear();
+    }
+    
   };
 
   /**
