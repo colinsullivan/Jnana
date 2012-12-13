@@ -86,6 +86,18 @@
   this.trackIsArmed = null;
 
   /**
+   *  If the ableton live session is currently paused, play.  Called from
+   *  many of the UI buttons because the session needs to be playing
+   *  for training and response to occur.
+   **/
+  this._play_session_if_paused = function () {
+    var isPlaying = this.api.get("is_playing")[0] === 1;
+    if (!isPlaying) {
+      this.api.set("is_playing", 1);
+    }
+  };
+
+  /**
    *  Called from max patch to enable or disable the automatic rendering
    *  of a clip based on input analysis.
    *
@@ -96,6 +108,12 @@
     newShouldAutoRespond = Boolean(newShouldAutoRespond);
 
     this.shouldAutoRespond = newShouldAutoRespond;
+
+    // if auto_response is enabled, ableton needs to be playing incase it 
+    // needs to respond.
+    if (this.shouldAutoRespond) {
+      this._play_session_if_paused();
+    }
 
     if (this.inputAnalyzer) {
       this.inputAnalyzer.set_auto_response(newShouldAutoRespond);
@@ -328,7 +346,7 @@
     }
 
     // if session is not playing, it will be now
-    this.api.set("is_playing", true);
+    this._play_session_if_paused();
 
 
     // generate manual clips and start playing first one
@@ -404,6 +422,7 @@
     // just initializing plugin
     if (this.shouldAutoTrain && this.track) {
       this.set_track_armed(true);
+      this._play_session_if_paused();
       this.status_message_out("Auto training enabled.");
     }
   };

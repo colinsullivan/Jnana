@@ -104,6 +104,10 @@
       CS.post(maxNumNotes * 6);
       CS.post("\n");
 
+      if (maxNumNotes === 0) {
+        return [];
+      }
+
       CS.post("extracting notes\n");
 
       for (i = 0; i < (maxNumNotes * 6); i += 6) {

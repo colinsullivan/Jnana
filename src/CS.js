@@ -23,7 +23,7 @@
   }
   
   CS = this.CS = {
-    DEBUG: false,
+    DEBUG: true,
     Ableton: {}
   };
   
