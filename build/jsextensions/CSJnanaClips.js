@@ -77,7 +77,7 @@
    **/
   this.trackWasAnalyzed = false;
 
-  function status_message(msg) {
+  this.status_message_out = function (msg) {
     outlet(0, ["set", msg]);
   }
 
@@ -94,6 +94,11 @@
 
     this.initDone = true;
     this.trackWasAnalyzed = false;
+
+    (new Task(function () {
+      this.status_message_out("Jnana ready.");
+    }, this)).schedule(500);
+
   };
 
   /**
@@ -168,7 +173,7 @@
     this.set_autogen(this.autoGenerateClips);
 
     this.trackWasAnalyzed = true;
-    status_message(this.analysisClips.length + " clips were analyzed.");
+    this.status_message_out(this.analysisClips.length + " clips were analyzed.");
 
   };
 
@@ -200,12 +205,12 @@
     }
     
     if (!this.trackWasAnalyzed) {
-      status_message("Track has not yet been analyzed!");
+      this.status_message_out("Track has not yet been analyzed!");
       return;
     }
 
     this._call_on_generative_clips("_generate_and_append_loop_async");
-    status_message(this.generativeClips.length + " clips were generated.");
+    this.status_message_out(this.generativeClips.length + " clips were generated.");
   };
 
   this.set_autogen_plays = function (x) {
@@ -229,7 +234,7 @@
     }
 
     if (!this.trackWasAnalyzed) {
-      status_message("Track has not yet been analyzed!");
+      this.status_message_out("Track has not yet been analyzed!");
       return;
     }
 
@@ -238,10 +243,10 @@
     if (autoGenOn) {
       // make sure clips know they should auto-generate
       this._call_on_generative_clips("start");
-      status_message(this.generativeClips.length + " clips being observed.");
+      this.status_message_out(this.generativeClips.length + " clips being observed.");
     } else {
       this._call_on_generative_clips("stop");
-      status_message(this.generativeClips.length + " clips no longer being observed.");
+      this.status_message_out(this.generativeClips.length + " clips no longer being observed.");
     }
     
   };
