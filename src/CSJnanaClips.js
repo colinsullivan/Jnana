@@ -79,7 +79,7 @@
 
   this.status_message_out = function (msg) {
     outlet(0, ["set", msg]);
-  }
+  };
 
   this.init = function () {
 
@@ -89,8 +89,10 @@
 
     this.track = new LiveAPI("this_device canonical_parent");
 
-    this.analysisClips = [];
-    this.generativeClips = [];
+    this.analysisClips = null;
+    this.generativeClips = null;
+
+    this.clear();
 
     this.initDone = true;
     this.trackWasAnalyzed = false;
@@ -99,6 +101,13 @@
       this.status_message_out("Jnana ready.");
     }, this)).schedule(500);
 
+  };
+
+  this.clear = function () {
+    this.analysisClips = [];
+    this.generativeClips = [];
+    this.analyzer.clear_analysis();
+    
   };
 
   /**
@@ -125,7 +134,8 @@
       clip,
       clipName;
 
-    
+    this.clear();
+
     /**
      *  Grab clips from session that will be analyzed and also those that
      *  will be used to populate with response material.

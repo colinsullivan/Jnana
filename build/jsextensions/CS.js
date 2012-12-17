@@ -3216,7 +3216,9 @@ if (typeof exports !== "undefined" && exports !== null) {
   };
 
   CS.Ableton.SelfGeneratingClip.prototype.stop = function () {
-    this._playingStatusObserver.cancel();
+    if (this._playingStatusObserver) {
+      this._playingStatusObserver.cancel();
+    }
     this._isAutogenerating = false;
   };
 
