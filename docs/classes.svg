@@ -1,0 +1,354 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.0//EN" "http://www.w3.org/TR/2001/PR-SVG-20010719/DTD/svg10.dtd">
+<svg width="119cm" height="80cm" viewBox="-1645 -74 2380 1595" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+  <g>
+    <rect style="fill: #ffffff" x="-477" y="-59" width="227.75" height="42"/>
+    <rect style="fill: none; fill-opacity:0; stroke-width: 2; stroke: #000000" x="-477" y="-59" width="227.75" height="42"/>
+    <text style="fill: #000000;text-anchor:middle;font-size:16;font-family:sanserif;font-style:normal;font-weight:700" x="-363.125" y="-40">CS.AbletonClip</text>
+    <text style="fill: #000000;text-anchor:middle;font-size:11.2;font-family:sanserif;font-style:italic;font-weight:normal" x="-363.125" y="-24.5">Representation of a clip within Ableton</text>
+    <rect style="fill: #ffffff" x="-477" y="-17" width="227.75" height="8"/>
+    <rect style="fill: none; fill-opacity:0; stroke-width: 2; stroke: #000000" x="-477" y="-17" width="227.75" height="8"/>
+    <rect style="fill: #ffffff" x="-477" y="-9" width="227.75" height="8"/>
+    <rect style="fill: none; fill-opacity:0; stroke-width: 2; stroke: #000000" x="-477" y="-9" width="227.75" height="8"/>
+  </g>
+  <g>
+    <rect style="fill: #ffffff" x="-1464.5" y="317.4" width="425.8" height="70"/>
+    <rect style="fill: none; fill-opacity:0; stroke-width: 2; stroke: #000000" x="-1464.5" y="317.4" width="425.8" height="70"/>
+    <text style="fill: #000000;text-anchor:middle;font-size:16;font-family:sanserif;font-style:normal;font-weight:700" x="-1251.6" y="336.4">CSJnanaClips</text>
+    <text style="fill: #000000;text-anchor:middle;font-size:11.2;font-family:sanserif;font-style:italic;font-weight:normal" x="-1251.6" y="351.9">Entry point from the Max for Live patch</text>
+    <text style="fill: #000000;text-anchor:middle;font-size:11.2;font-family:sanserif;font-style:italic;font-weight:normal" x="-1251.6" y="365.9">that analyzes clips and generates other</text>
+    <text style="fill: #000000;text-anchor:middle;font-size:11.2;font-family:sanserif;font-style:italic;font-weight:normal" x="-1251.6" y="379.9">clips.</text>
+    <rect style="fill: #ffffff" x="-1464.5" y="387.4" width="425.8" height="52"/>
+    <rect style="fill: none; fill-opacity:0; stroke-width: 2; stroke: #000000" x="-1464.5" y="387.4" width="425.8" height="52"/>
+    <text style="fill: #000000;text-anchor:start;font-size:12.8;font-family:monospace;font-style:normal;font-weight:normal" x="-1461.5" y="401.4">+analyzer: CS.PhraseAnalyzer</text>
+    <text style="fill: #000000;text-anchor:start;font-size:12.8;font-family:monospace;font-style:normal;font-weight:normal" x="-1461.5" y="417.4">+analysisClips: Array[CS.Ableton.Clip]</text>
+    <text style="fill: #000000;text-anchor:start;font-size:12.8;font-family:monospace;font-style:normal;font-weight:normal" x="-1461.5" y="433.4">+generativeClips: Array[CS.Ableton.SelfGeneratingClip]</text>
+    <rect style="fill: #ffffff" x="-1464.5" y="439.4" width="425.8" height="8"/>
+    <rect style="fill: none; fill-opacity:0; stroke-width: 2; stroke: #000000" x="-1464.5" y="439.4" width="425.8" height="8"/>
+  </g>
+  <g>
+    <rect style="fill: #ffffff" x="-534.5" y="130.4" width="341.1" height="70"/>
+    <rect style="fill: none; fill-opacity:0; stroke-width: 2; stroke: #000000" x="-534.5" y="130.4" width="341.1" height="70"/>
+    <text style="fill: #000000;text-anchor:middle;font-size:16;font-family:sanserif;font-style:normal;font-weight:700" x="-363.95" y="149.4">CS.Ableton.PhraseRenderingClip</text>
+    <text style="fill: #000000;text-anchor:middle;font-size:11.2;font-family:sanserif;font-style:italic;font-weight:normal" x="-363.95" y="164.9">A clip within Ableton that can be</text>
+    <text style="fill: #000000;text-anchor:middle;font-size:11.2;font-family:sanserif;font-style:italic;font-weight:normal" x="-363.95" y="178.9">populated with the contents of a</text>
+    <text style="fill: #000000;text-anchor:middle;font-size:11.2;font-family:sanserif;font-style:italic;font-weight:normal" x="-363.95" y="192.9">`Phrase` instance.</text>
+    <rect style="fill: #ffffff" x="-534.5" y="200.4" width="341.1" height="20"/>
+    <rect style="fill: none; fill-opacity:0; stroke-width: 2; stroke: #000000" x="-534.5" y="200.4" width="341.1" height="20"/>
+    <text style="fill: #000000;text-anchor:start;font-size:12.8;font-family:monospace;font-style:normal;font-weight:normal" x="-531.5" y="214.4">+_phraseGenerator: CS.MarkovPhraseGenerator</text>
+    <rect style="fill: #ffffff" x="-534.5" y="220.4" width="341.1" height="8"/>
+    <rect style="fill: none; fill-opacity:0; stroke-width: 2; stroke: #000000" x="-534.5" y="220.4" width="341.1" height="8"/>
+  </g>
+  <g>
+    <rect style="fill: #ffffff" x="-506.834" y="337.066" width="285.95" height="70"/>
+    <rect style="fill: none; fill-opacity:0; stroke-width: 2; stroke: #000000" x="-506.834" y="337.066" width="285.95" height="70"/>
+    <text style="fill: #000000;text-anchor:middle;font-size:16;font-family:sanserif;font-style:normal;font-weight:700" x="-363.859" y="356.066">CS.Ableton.SelfGeneratingClip</text>
+    <text style="fill: #000000;text-anchor:middle;font-size:11.2;font-family:sanserif;font-style:italic;font-weight:normal" x="-363.859" y="371.566">A clip within Ableton will</text>
+    <text style="fill: #000000;text-anchor:middle;font-size:11.2;font-family:sanserif;font-style:italic;font-weight:normal" x="-363.859" y="385.566">self-generate after a specified number</text>
+    <text style="fill: #000000;text-anchor:middle;font-size:11.2;font-family:sanserif;font-style:italic;font-weight:normal" x="-363.859" y="399.566">of plays.</text>
+    <rect style="fill: #ffffff" x="-506.834" y="407.066" width="285.95" height="8"/>
+    <rect style="fill: none; fill-opacity:0; stroke-width: 2; stroke: #000000" x="-506.834" y="407.066" width="285.95" height="8"/>
+    <rect style="fill: #ffffff" x="-506.834" y="415.066" width="285.95" height="8"/>
+    <rect style="fill: none; fill-opacity:0; stroke-width: 2; stroke: #000000" x="-506.834" y="415.066" width="285.95" height="8"/>
+  </g>
+  <g>
+    <polyline style="fill: none; fill-opacity:0; stroke-width: 2; stroke: #000000" points="-363.95,247.642 -363.95,282.733 -363.859,282.733 -363.859,336.061 "/>
+    <polygon style="fill: #ffffff" points="-355.95,247.642 -363.95,231.642 -371.95,247.642 "/>
+    <polygon style="fill: none; fill-opacity:0; stroke-width: 2; stroke: #000000" points="-355.95,247.642 -363.95,231.642 -371.95,247.642 "/>
+  </g>
+  <g>
+    <rect style="fill: #ffffff" x="-1128.5" y="633.4" width="250.75" height="70"/>
+    <rect style="fill: none; fill-opacity:0; stroke-width: 2; stroke: #000000" x="-1128.5" y="633.4" width="250.75" height="70"/>
+    <text style="fill: #000000;text-anchor:middle;font-size:16;font-family:sanserif;font-style:normal;font-weight:700" x="-1003.12" y="652.4">CS.InputAnalyzer</text>
+    <text style="fill: #000000;text-anchor:middle;font-size:11.2;font-family:sanserif;font-style:italic;font-weight:normal" x="-1003.12" y="667.9">Handles incoming note events,</text>
+    <text style="fill: #000000;text-anchor:middle;font-size:11.2;font-family:sanserif;font-style:italic;font-weight:normal" x="-1003.12" y="681.9">determining when a phrase has completed</text>
+    <text style="fill: #000000;text-anchor:middle;font-size:11.2;font-family:sanserif;font-style:italic;font-weight:normal" x="-1003.12" y="695.9">based on a timeout.</text>
+    <rect style="fill: #ffffff" x="-1128.5" y="703.4" width="250.75" height="8"/>
+    <rect style="fill: none; fill-opacity:0; stroke-width: 2; stroke: #000000" x="-1128.5" y="703.4" width="250.75" height="8"/>
+    <rect style="fill: #ffffff" x="-1128.5" y="711.4" width="250.75" height="8"/>
+    <rect style="fill: none; fill-opacity:0; stroke-width: 2; stroke: #000000" x="-1128.5" y="711.4" width="250.75" height="8"/>
+  </g>
+  <g>
+    <rect style="fill: #ffffff" x="35.166" y="1359.4" width="279.5" height="84"/>
+    <rect style="fill: none; fill-opacity:0; stroke-width: 2; stroke: #000000" x="35.166" y="1359.4" width="279.5" height="84"/>
+    <text style="fill: #000000;text-anchor:middle;font-size:16;font-family:sanserif;font-style:normal;font-weight:700" x="174.916" y="1378.4">CS.MarkovMultiStateMachine</text>
+    <text style="fill: #000000;text-anchor:middle;font-size:11.2;font-family:sanserif;font-style:italic;font-weight:normal" x="174.916" y="1393.9">Uses a set of state machines to</text>
+    <text style="fill: #000000;text-anchor:middle;font-size:11.2;font-family:sanserif;font-style:italic;font-weight:normal" x="174.916" y="1407.9">generate a conglomerate state where</text>
+    <text style="fill: #000000;text-anchor:middle;font-size:11.2;font-family:sanserif;font-style:italic;font-weight:normal" x="174.916" y="1421.9">each table has generated one property</text>
+    <text style="fill: #000000;text-anchor:middle;font-size:11.2;font-family:sanserif;font-style:italic;font-weight:normal" x="174.916" y="1435.9">of the state.</text>
+    <rect style="fill: #ffffff" x="35.166" y="1443.4" width="279.5" height="69"/>
+    <rect style="fill: none; fill-opacity:0; stroke-width: 2; stroke: #000000" x="35.166" y="1443.4" width="279.5" height="69"/>
+    <text style="fill: #000000;text-anchor:start;font-size:12.8;font-family:monospace;font-style:normal;font-weight:normal" x="38.166" y="1457.4">+_machines: CS.MarkovStateMachine{}</text>
+    <text style="fill: #000000;text-anchor:start;font-size:11.2;font-family:sanserif;font-style:italic;font-weight:normal" x="38.166" y="1471.9">`MarkovStateMachine` instances to use</text>
+    <text style="fill: #000000;text-anchor:start;font-size:11.2;font-family:sanserif;font-style:italic;font-weight:normal" x="38.166" y="1485.9">to generate events, keyed by the</text>
+    <text style="fill: #000000;text-anchor:start;font-size:11.2;font-family:sanserif;font-style:italic;font-weight:normal" x="38.166" y="1499.9">parameter that table will generate.</text>
+    <rect style="fill: #ffffff" x="35.166" y="1512.4" width="279.5" height="8"/>
+    <rect style="fill: none; fill-opacity:0; stroke-width: 2; stroke: #000000" x="35.166" y="1512.4" width="279.5" height="8"/>
+  </g>
+  <g>
+    <rect style="fill: #ffffff" x="401.166" y="915.066" width="333.4" height="56"/>
+    <rect style="fill: none; fill-opacity:0; stroke-width: 2; stroke: #000000" x="401.166" y="915.066" width="333.4" height="56"/>
+    <text style="fill: #000000;text-anchor:middle;font-size:16;font-family:sanserif;font-style:normal;font-weight:700" x="567.866" y="934.066">CS.MarkovPhraseGenerator</text>
+    <text style="fill: #000000;text-anchor:middle;font-size:11.2;font-family:sanserif;font-style:italic;font-weight:normal" x="567.866" y="949.566">Uses a set of markov tables to generate</text>
+    <text style="fill: #000000;text-anchor:middle;font-size:11.2;font-family:sanserif;font-style:italic;font-weight:normal" x="567.866" y="963.566">phrases.</text>
+    <rect style="fill: #ffffff" x="401.166" y="971.066" width="333.4" height="36"/>
+    <rect style="fill: none; fill-opacity:0; stroke-width: 2; stroke: #000000" x="401.166" y="971.066" width="333.4" height="36"/>
+    <text style="fill: #000000;text-anchor:start;font-size:12.8;font-family:monospace;font-style:normal;font-weight:normal" x="404.166" y="985.066">+_stateMachine: CS.MarkovMultiStateMachine</text>
+    <text style="fill: #000000;text-anchor:start;font-size:12.8;font-family:monospace;font-style:normal;font-weight:normal" x="404.166" y="1001.07">+phraseAnalyzer: CS.PhraseAnalyzer</text>
+    <rect style="fill: #ffffff" x="401.166" y="1007.07" width="333.4" height="8"/>
+    <rect style="fill: none; fill-opacity:0; stroke-width: 2; stroke: #000000" x="401.166" y="1007.07" width="333.4" height="8"/>
+  </g>
+  <g>
+    <polyline style="fill: none; fill-opacity:0; stroke-width: 2; stroke: #000000" points="374.989,965.066 357.918,965.066 357.918,1439.9 315.675,1439.9 "/>
+    <polygon style="fill: #ffffff" points="400.161,965.066 386.161,969.866 372.161,965.066 386.161,960.266 "/>
+    <polygon style="fill: none; fill-opacity:0; stroke-width: 2; stroke: #000000" points="400.161,965.066 386.161,969.866 372.161,965.066 386.161,960.266 "/>
+    <text style="fill: #000000;text-anchor:start;font-size:12.7998;font-family:monospace;font-style:normal;font-weight:normal" x="359.918" y="1199.48"></text>
+    <text style="fill: #000000;text-anchor:end;font-size:12.7998;font-family:monospace;font-style:normal;font-weight:normal" x="368.161" y="962.066"></text>
+    <text style="fill: #000000;text-anchor:start;font-size:12.7998;font-family:monospace;font-style:normal;font-weight:normal" x="319.675" y="1436.9"></text>
+  </g>
+  <g>
+    <rect style="fill: #ffffff" x="-253.5" y="730.4" width="233.35" height="84"/>
+    <rect style="fill: none; fill-opacity:0; stroke-width: 2; stroke: #000000" x="-253.5" y="730.4" width="233.35" height="84"/>
+    <text style="fill: #000000;text-anchor:middle;font-size:16;font-family:sanserif;font-style:normal;font-weight:700" x="-136.825" y="749.4">CS.MarkovTable</text>
+    <text style="fill: #000000;text-anchor:middle;font-size:11.2;font-family:sanserif;font-style:italic;font-weight:normal" x="-136.825" y="764.9">A single Markov Table implementation</text>
+    <text style="fill: #000000;text-anchor:middle;font-size:11.2;font-family:sanserif;font-style:italic;font-weight:normal" x="-136.825" y="778.9">that tracks statistics of input data. </text>
+    <text style="fill: #000000;text-anchor:middle;font-size:11.2;font-family:sanserif;font-style:italic;font-weight:normal" x="-136.825" y="792.9">Order of markov table is provided as an</text>
+    <text style="fill: #000000;text-anchor:middle;font-size:11.2;font-family:sanserif;font-style:italic;font-weight:normal" x="-136.825" y="806.9">input parameter.</text>
+    <rect style="fill: #ffffff" x="-253.5" y="814.4" width="233.35" height="20"/>
+    <rect style="fill: none; fill-opacity:0; stroke-width: 2; stroke: #000000" x="-253.5" y="814.4" width="233.35" height="20"/>
+    <text style="fill: #000000;text-anchor:start;font-size:12.8;font-family:monospace;font-style:normal;font-weight:normal" x="-250.5" y="828.4">+rows: CS.MarkovTableRow[]</text>
+    <rect style="fill: #ffffff" x="-253.5" y="834.4" width="233.35" height="8"/>
+    <rect style="fill: none; fill-opacity:0; stroke-width: 2; stroke: #000000" x="-253.5" y="834.4" width="233.35" height="8"/>
+  </g>
+  <g>
+    <rect style="fill: #ffffff" x="50.5" y="729.4" width="237.2" height="98"/>
+    <rect style="fill: none; fill-opacity:0; stroke-width: 2; stroke: #000000" x="50.5" y="729.4" width="237.2" height="98"/>
+    <text style="fill: #000000;text-anchor:middle;font-size:16;font-family:sanserif;font-style:normal;font-weight:700" x="169.1" y="748.4">CS.MarkovTableRow</text>
+    <text style="fill: #000000;text-anchor:middle;font-size:11.2;font-family:sanserif;font-style:italic;font-weight:normal" x="169.1" y="763.9">Represents a single row within a Markov</text>
+    <text style="fill: #000000;text-anchor:middle;font-size:11.2;font-family:sanserif;font-style:italic;font-weight:normal" x="169.1" y="777.9">Table.  Encapsulates logic for</text>
+    <text style="fill: #000000;text-anchor:middle;font-size:11.2;font-family:sanserif;font-style:italic;font-weight:normal" x="169.1" y="791.9">calculating probabilities and provides</text>
+    <text style="fill: #000000;text-anchor:middle;font-size:11.2;font-family:sanserif;font-style:italic;font-weight:normal" x="169.1" y="805.9">an interface for adding "occurences" to</text>
+    <text style="fill: #000000;text-anchor:middle;font-size:11.2;font-family:sanserif;font-style:italic;font-weight:normal" x="169.1" y="819.9">the row.</text>
+    <rect style="fill: #ffffff" x="50.5" y="827.4" width="237.2" height="8"/>
+    <rect style="fill: none; fill-opacity:0; stroke-width: 2; stroke: #000000" x="50.5" y="827.4" width="237.2" height="8"/>
+    <rect style="fill: #ffffff" x="50.5" y="835.4" width="237.2" height="8"/>
+    <rect style="fill: none; fill-opacity:0; stroke-width: 2; stroke: #000000" x="50.5" y="835.4" width="237.2" height="8"/>
+  </g>
+  <g>
+    <polyline style="fill: none; fill-opacity:0; stroke-width: 2; stroke: #000000" points="6.02791,786.4 26.725,786.4 26.725,786.4 49.5099,786.4 "/>
+    <polygon style="fill: #ffffff" points="-19.1437,786.4 -5.14367,781.6 8.85633,786.4 -5.14367,791.2 "/>
+    <polygon style="fill: none; fill-opacity:0; stroke-width: 2; stroke: #000000" points="-19.1437,786.4 -5.14367,781.6 8.85633,786.4 -5.14367,791.2 "/>
+    <text style="fill: #000000;text-anchor:middle;font-size:12.7998;font-family:monospace;font-style:normal;font-weight:normal" x="26.725" y="783.4"></text>
+    <text style="fill: #000000;text-anchor:start;font-size:12.7998;font-family:monospace;font-style:normal;font-weight:normal" x="12.8563" y="783.4"></text>
+    <text style="fill: #000000;text-anchor:end;font-size:12.7998;font-family:monospace;font-style:normal;font-weight:normal" x="45.5099" y="783.4"></text>
+  </g>
+  <g>
+    <rect style="fill: #ffffff" x="-128.5" y="-72.6" width="221.35" height="70"/>
+    <rect style="fill: none; fill-opacity:0; stroke-width: 2; stroke: #000000" x="-128.5" y="-72.6" width="221.35" height="70"/>
+    <text style="fill: #000000;text-anchor:middle;font-size:16;font-family:sanserif;font-style:normal;font-weight:700" x="-17.825" y="-53.6">CS.Phrase</text>
+    <text style="fill: #000000;text-anchor:middle;font-size:11.2;font-family:sanserif;font-style:italic;font-weight:normal" x="-17.825" y="-38.1">A collection of notes with timestamps</text>
+    <text style="fill: #000000;text-anchor:middle;font-size:11.2;font-family:sanserif;font-style:italic;font-weight:normal" x="-17.825" y="-24.1">and other properties, such as pitch</text>
+    <text style="fill: #000000;text-anchor:middle;font-size:11.2;font-family:sanserif;font-style:italic;font-weight:normal" x="-17.825" y="-10.1">associated with them.</text>
+    <rect style="fill: #ffffff" x="-128.5" y="-2.6" width="221.35" height="8"/>
+    <rect style="fill: none; fill-opacity:0; stroke-width: 2; stroke: #000000" x="-128.5" y="-2.6" width="221.35" height="8"/>
+    <rect style="fill: #ffffff" x="-128.5" y="5.4" width="221.35" height="8"/>
+    <rect style="fill: none; fill-opacity:0; stroke-width: 2; stroke: #000000" x="-128.5" y="5.4" width="221.35" height="8"/>
+  </g>
+  <g>
+    <rect style="fill: #ffffff" x="208.5" y="-72.6" width="220.9" height="70"/>
+    <rect style="fill: none; fill-opacity:0; stroke-width: 2; stroke: #000000" x="208.5" y="-72.6" width="220.9" height="70"/>
+    <text style="fill: #000000;text-anchor:middle;font-size:16;font-family:sanserif;font-style:normal;font-weight:700" x="318.95" y="-53.6">CS.PhraseNote</text>
+    <text style="fill: #000000;text-anchor:middle;font-size:11.2;font-family:sanserif;font-style:italic;font-weight:normal" x="318.95" y="-38.1">Simple encapsulation of a note that</text>
+    <text style="fill: #000000;text-anchor:middle;font-size:11.2;font-family:sanserif;font-style:italic;font-weight:normal" x="318.95" y="-24.1">belongs to a phrase and its attributes</text>
+    <text style="fill: #000000;text-anchor:middle;font-size:11.2;font-family:sanserif;font-style:italic;font-weight:normal" x="318.95" y="-10.1">such as pitch, velocity, etc.</text>
+    <rect style="fill: #ffffff" x="208.5" y="-2.6" width="220.9" height="8"/>
+    <rect style="fill: none; fill-opacity:0; stroke-width: 2; stroke: #000000" x="208.5" y="-2.6" width="220.9" height="8"/>
+    <rect style="fill: #ffffff" x="208.5" y="5.4" width="220.9" height="8"/>
+    <rect style="fill: none; fill-opacity:0; stroke-width: 2; stroke: #000000" x="208.5" y="5.4" width="220.9" height="8"/>
+  </g>
+  <g>
+    <polyline style="fill: none; fill-opacity:0; stroke-width: 2; stroke: #000000" points="-223.071,-30 -188.875,-30 -188.875,-29.6 -129.507,-29.6 "/>
+    <polygon style="fill: #ffffff" points="-248.243,-30 -234.243,-34.8 -220.243,-30 -234.243,-25.2 "/>
+    <polygon style="fill: none; fill-opacity:0; stroke-width: 2; stroke: #000000" points="-248.243,-30 -234.243,-34.8 -220.243,-30 -234.243,-25.2 "/>
+    <text style="fill: #000000;text-anchor:start;font-size:12.7998;font-family:monospace;font-style:normal;font-weight:normal" x="-186.875" y="-32.8"></text>
+    <text style="fill: #000000;text-anchor:start;font-size:12.7998;font-family:monospace;font-style:normal;font-weight:normal" x="-216.243" y="-33"></text>
+    <text style="fill: #000000;text-anchor:end;font-size:12.7998;font-family:monospace;font-style:normal;font-weight:normal" x="-133.507" y="-32.6"></text>
+  </g>
+  <g>
+    <polyline style="fill: none; fill-opacity:0; stroke-width: 2; stroke: #000000" points="119.028,-29.6 207.493,-29.6 207.493,-29.6 "/>
+    <polygon style="fill: #ffffff" points="93.8568,-29.6 107.857,-34.4 121.857,-29.6 107.857,-24.8 "/>
+    <polygon style="fill: none; fill-opacity:0; stroke-width: 2; stroke: #000000" points="93.8568,-29.6 107.857,-34.4 121.857,-29.6 107.857,-24.8 "/>
+    <text style="fill: #000000;text-anchor:middle;font-size:12.7998;font-family:monospace;font-style:normal;font-weight:normal" x="150.675" y="-32.6"></text>
+    <text style="fill: #000000;text-anchor:start;font-size:12.7998;font-family:monospace;font-style:normal;font-weight:normal" x="125.857" y="-32.6"></text>
+    <text style="fill: #000000;text-anchor:end;font-size:12.7998;font-family:monospace;font-style:normal;font-weight:normal" x="203.493" y="-32.6"></text>
+  </g>
+  <g>
+    <polyline style="fill: none; fill-opacity:0; stroke-width: 2; stroke: #000000" points="-167.241,179.4 350,179.4 350,965.066 400.185,965.066 "/>
+    <polygon style="fill: #ffffff" points="-192.413,179.4 -178.413,174.6 -164.413,179.4 -178.413,184.2 "/>
+    <polygon style="fill: none; fill-opacity:0; stroke-width: 2; stroke: #000000" points="-192.413,179.4 -178.413,174.6 -164.413,179.4 -178.413,184.2 "/>
+    <text style="fill: #000000;text-anchor:start;font-size:12.7998;font-family:monospace;font-style:normal;font-weight:normal" x="352" y="569.233"></text>
+    <text style="fill: #000000;text-anchor:start;font-size:12.7998;font-family:monospace;font-style:normal;font-weight:normal" x="-160.413" y="176.4"></text>
+    <text style="fill: #000000;text-anchor:end;font-size:12.7998;font-family:monospace;font-style:normal;font-weight:normal" x="396.185" y="962.066"></text>
+  </g>
+  <g>
+    <rect style="fill: #ffffff" x="56.8666" y="513.884" width="224.05" height="84"/>
+    <rect style="fill: none; fill-opacity:0; stroke-width: 2; stroke: #000000" x="56.8666" y="513.884" width="224.05" height="84"/>
+    <text style="fill: #000000;text-anchor:middle;font-size:16;font-family:sanserif;font-style:normal;font-weight:700" x="168.892" y="532.884">CS.ProbabilityVector</text>
+    <text style="fill: #000000;text-anchor:middle;font-size:11.2;font-family:sanserif;font-style:italic;font-weight:normal" x="168.892" y="548.384">Encapsulates logic for a listing of</text>
+    <text style="fill: #000000;text-anchor:middle;font-size:11.2;font-family:sanserif;font-style:italic;font-weight:normal" x="168.892" y="562.384">probabilities associated with keys and</text>
+    <text style="fill: #000000;text-anchor:middle;font-size:11.2;font-family:sanserif;font-style:italic;font-weight:normal" x="168.892" y="576.384">choosing a key based on those</text>
+    <text style="fill: #000000;text-anchor:middle;font-size:11.2;font-family:sanserif;font-style:italic;font-weight:normal" x="168.892" y="590.384">probabilities.</text>
+    <rect style="fill: #ffffff" x="56.8666" y="597.884" width="224.05" height="8"/>
+    <rect style="fill: none; fill-opacity:0; stroke-width: 2; stroke: #000000" x="56.8666" y="597.884" width="224.05" height="8"/>
+    <rect style="fill: #ffffff" x="56.8666" y="605.884" width="224.05" height="8"/>
+    <rect style="fill: none; fill-opacity:0; stroke-width: 2; stroke: #000000" x="56.8666" y="605.884" width="224.05" height="8"/>
+  </g>
+  <g>
+    <polyline style="fill: none; fill-opacity:0; stroke-width: 2; stroke: #000000" points="168.892,633.126 168.892,671.642 169.1,671.642 169.1,728.393 "/>
+    <polygon style="fill: #ffffff" points="176.892,633.126 168.892,617.126 160.892,633.126 "/>
+    <polygon style="fill: none; fill-opacity:0; stroke-width: 2; stroke: #000000" points="176.892,633.126 168.892,617.126 160.892,633.126 "/>
+  </g>
+  <g>
+    <rect style="fill: #ffffff" x="-1174.5" y="853.5" width="341.1" height="70"/>
+    <rect style="fill: none; fill-opacity:0; stroke-width: 2; stroke: #000000" x="-1174.5" y="853.5" width="341.1" height="70"/>
+    <text style="fill: #000000;text-anchor:middle;font-size:16;font-family:sanserif;font-style:normal;font-weight:700" x="-1003.95" y="872.5">CS.Ableton.InputAnalyzer</text>
+    <text style="fill: #000000;text-anchor:middle;font-size:11.2;font-family:sanserif;font-style:italic;font-weight:normal" x="-1003.95" y="888">Analyzes live input from an Ableton</text>
+    <text style="fill: #000000;text-anchor:middle;font-size:11.2;font-family:sanserif;font-style:italic;font-weight:normal" x="-1003.95" y="902">Live track and initiates</text>
+    <text style="fill: #000000;text-anchor:middle;font-size:11.2;font-family:sanserif;font-style:italic;font-weight:normal" x="-1003.95" y="916">self-generating clips.</text>
+    <rect style="fill: #ffffff" x="-1174.5" y="923.5" width="341.1" height="52"/>
+    <rect style="fill: none; fill-opacity:0; stroke-width: 2; stroke: #000000" x="-1174.5" y="923.5" width="341.1" height="52"/>
+    <text style="fill: #000000;text-anchor:start;font-size:12.8;font-family:monospace;font-style:normal;font-weight:normal" x="-1171.5" y="937.5">+genClips: CS.Ableton.SelfGeneratingClip[]</text>
+    <text style="fill: #000000;text-anchor:start;font-size:12.8;font-family:monospace;font-style:normal;font-weight:normal" x="-1171.5" y="953.5">+autoGenClip: CS.Ableton.SelfGeneratingClip</text>
+    <text style="fill: #000000;text-anchor:start;font-size:12.8;font-family:monospace;font-style:normal;font-weight:normal" x="-1171.5" y="969.5">+phraseAnalyzer: CS.PhraseAnalyzer</text>
+    <rect style="fill: #ffffff" x="-1174.5" y="975.5" width="341.1" height="8"/>
+    <rect style="fill: none; fill-opacity:0; stroke-width: 2; stroke: #000000" x="-1174.5" y="975.5" width="341.1" height="8"/>
+  </g>
+  <g>
+    <polyline style="fill: none; fill-opacity:0; stroke-width: 2; stroke: #000000" points="-1003.12,738.641 -1003.12,786.449 -1003.95,786.449 -1003.95,852.492 "/>
+    <polygon style="fill: #ffffff" points="-995.125,738.641 -1003.12,722.641 -1011.12,738.641 "/>
+    <polygon style="fill: none; fill-opacity:0; stroke-width: 2; stroke: #000000" points="-995.125,738.641 -1003.12,722.641 -1011.12,738.641 "/>
+  </g>
+  <g>
+    <rect style="fill: #ffffff" x="-292.7" y="1372.3" width="229.7" height="56"/>
+    <rect style="fill: none; fill-opacity:0; stroke-width: 2; stroke: #000000" x="-292.7" y="1372.3" width="229.7" height="56"/>
+    <text style="fill: #000000;text-anchor:middle;font-size:16;font-family:sanserif;font-style:normal;font-weight:700" x="-177.85" y="1391.3">CS.MarkovStateMachine</text>
+    <text style="fill: #000000;text-anchor:middle;font-size:11.2;font-family:sanserif;font-style:italic;font-weight:normal" x="-177.85" y="1406.8">Uses a markov table of statistics to</text>
+    <text style="fill: #000000;text-anchor:middle;font-size:11.2;font-family:sanserif;font-style:italic;font-weight:normal" x="-177.85" y="1420.8">maintain a state.</text>
+    <rect style="fill: #ffffff" x="-292.7" y="1428.3" width="229.7" height="69"/>
+    <rect style="fill: none; fill-opacity:0; stroke-width: 2; stroke: #000000" x="-292.7" y="1428.3" width="229.7" height="69"/>
+    <text style="fill: #000000;text-anchor:start;font-size:12.8;font-family:monospace;font-style:normal;font-weight:normal" x="-289.7" y="1442.3">+_table: CS.MarkovTable</text>
+    <text style="fill: #000000;text-anchor:start;font-size:11.2;font-family:sanserif;font-style:italic;font-weight:normal" x="-289.7" y="1456.8">`MarkovTable` instance which has all</text>
+    <text style="fill: #000000;text-anchor:start;font-size:11.2;font-family:sanserif;font-style:italic;font-weight:normal" x="-289.7" y="1470.8">probability information used to</text>
+    <text style="fill: #000000;text-anchor:start;font-size:11.2;font-family:sanserif;font-style:italic;font-weight:normal" x="-289.7" y="1484.8">generate states.</text>
+    <rect style="fill: #ffffff" x="-292.7" y="1497.3" width="229.7" height="8"/>
+    <rect style="fill: none; fill-opacity:0; stroke-width: 2; stroke: #000000" x="-292.7" y="1497.3" width="229.7" height="8"/>
+  </g>
+  <g>
+    <polyline style="fill: none; fill-opacity:0; stroke-width: 2; stroke: #000000" points="-177.85,1346.12 -177.85,1107.35 -136.825,1107.35 -136.825,843.407 "/>
+    <polygon style="fill: #ffffff" points="-177.85,1371.29 -182.65,1357.29 -177.85,1343.29 -173.05,1357.29 "/>
+    <polygon style="fill: none; fill-opacity:0; stroke-width: 2; stroke: #000000" points="-177.85,1371.29 -182.65,1357.29 -177.85,1343.29 -173.05,1357.29 "/>
+    <text style="fill: #000000;text-anchor:middle;font-size:12.7998;font-family:monospace;font-style:normal;font-weight:normal" x="-157.338" y="1104.35"></text>
+    <text style="fill: #000000;text-anchor:start;font-size:12.7998;font-family:monospace;font-style:normal;font-weight:normal" x="-166.85" y="1367.29"></text>
+    <text style="fill: #000000;text-anchor:start;font-size:12.7998;font-family:monospace;font-style:normal;font-weight:normal" x="-132.825" y="855.407"></text>
+  </g>
+  <g>
+    <polyline style="fill: none; fill-opacity:0; stroke-width: 2; stroke: #000000" points="8.98584,1439.9 -13.9178,1439.9 -13.9178,1438.8 -61.9929,1438.8 "/>
+    <polygon style="fill: #ffffff" points="34.1574,1439.9 20.1574,1444.7 6.15741,1439.9 20.1574,1435.1 "/>
+    <polygon style="fill: none; fill-opacity:0; stroke-width: 2; stroke: #000000" points="34.1574,1439.9 20.1574,1444.7 6.15741,1439.9 20.1574,1435.1 "/>
+    <text style="fill: #000000;text-anchor:start;font-size:12.7998;font-family:monospace;font-style:normal;font-weight:normal" x="-11.9178" y="1436.35"></text>
+    <text style="fill: #000000;text-anchor:end;font-size:12.7998;font-family:monospace;font-style:normal;font-weight:normal" x="2.15741" y="1436.9"></text>
+    <text style="fill: #000000;text-anchor:start;font-size:12.7998;font-family:monospace;font-style:normal;font-weight:normal" x="-57.9929" y="1435.8"></text>
+  </g>
+  <g>
+    <rect style="fill: #ffffff" x="-699.4" y="815.9" width="310.3" height="84"/>
+    <rect style="fill: none; fill-opacity:0; stroke-width: 2; stroke: #000000" x="-699.4" y="815.9" width="310.3" height="84"/>
+    <text style="fill: #000000;text-anchor:middle;font-size:16;font-family:sanserif;font-style:normal;font-weight:700" x="-544.25" y="834.9">CS.PhraseAnalyzer</text>
+    <text style="fill: #000000;text-anchor:middle;font-size:11.2;font-family:sanserif;font-style:italic;font-weight:normal" x="-544.25" y="850.4">Uses a set of statistical methods to</text>
+    <text style="fill: #000000;text-anchor:middle;font-size:11.2;font-family:sanserif;font-style:italic;font-weight:normal" x="-544.25" y="864.4">analyze musical phrases.  Provides API</text>
+    <text style="fill: #000000;text-anchor:middle;font-size:11.2;font-family:sanserif;font-style:italic;font-weight:normal" x="-544.25" y="878.4">needed by `CS.PhraseGenerator`</text>
+    <text style="fill: #000000;text-anchor:middle;font-size:11.2;font-family:sanserif;font-style:italic;font-weight:normal" x="-544.25" y="892.4">instances to generate new phrases.</text>
+    <rect style="fill: #ffffff" x="-699.4" y="899.9" width="310.3" height="100"/>
+    <rect style="fill: none; fill-opacity:0; stroke-width: 2; stroke: #000000" x="-699.4" y="899.9" width="310.3" height="100"/>
+    <text style="fill: #000000;text-anchor:start;font-size:12.8;font-family:monospace;font-style:normal;font-weight:normal" x="-696.4" y="913.9">+_pitchTable: CS.MarkovTable</text>
+    <text style="fill: #000000;text-anchor:start;font-size:12.8;font-family:monospace;font-style:normal;font-weight:normal" x="-696.4" y="929.9">+_durationTable: CS.MarkovTable</text>
+    <text style="fill: #000000;text-anchor:start;font-size:12.8;font-family:monospace;font-style:normal;font-weight:normal" x="-696.4" y="945.9">+_velocityTable: CS.MarkovTable</text>
+    <text style="fill: #000000;text-anchor:start;font-size:12.8;font-family:monospace;font-style:normal;font-weight:normal" x="-696.4" y="961.9">+_circularPitchTable: CS.MarkovTable</text>
+    <text style="fill: #000000;text-anchor:start;font-size:12.8;font-family:monospace;font-style:normal;font-weight:normal" x="-696.4" y="977.9">+_circularDurationTable: CS.MarkovTable</text>
+    <text style="fill: #000000;text-anchor:start;font-size:12.8;font-family:monospace;font-style:normal;font-weight:normal" x="-696.4" y="993.9">+_circularVelocityTable: CS.MarkovTable</text>
+    <rect style="fill: #ffffff" x="-699.4" y="999.9" width="310.3" height="8"/>
+    <rect style="fill: none; fill-opacity:0; stroke-width: 2; stroke: #000000" x="-699.4" y="999.9" width="310.3" height="8"/>
+  </g>
+  <g>
+    <polyline style="fill: none; fill-opacity:0; stroke-width: 2; stroke: #000000" points="-807.223,918.5 -766.402,918.5 -766.402,911.9 -700.41,911.9 "/>
+    <polygon style="fill: #ffffff" points="-832.395,918.5 -818.395,913.7 -804.395,918.5 -818.395,923.3 "/>
+    <polygon style="fill: none; fill-opacity:0; stroke-width: 2; stroke: #000000" points="-832.395,918.5 -818.395,913.7 -804.395,918.5 -818.395,923.3 "/>
+    <text style="fill: #000000;text-anchor:start;font-size:12.7998;font-family:monospace;font-style:normal;font-weight:normal" x="-764.402" y="912.2"></text>
+    <text style="fill: #000000;text-anchor:start;font-size:12.7998;font-family:monospace;font-style:normal;font-weight:normal" x="-800.395" y="915.5"></text>
+    <text style="fill: #000000;text-anchor:end;font-size:12.7998;font-family:monospace;font-style:normal;font-weight:normal" x="-704.41" y="908.9"></text>
+  </g>
+  <g>
+    <polyline style="fill: none; fill-opacity:0; stroke-width: 2; stroke: #000000" points="-362.919,911.9 -321.299,911.9 -321.299,786.4 -254.507,786.4 "/>
+    <polygon style="fill: #ffffff" points="-388.09,911.9 -374.09,907.1 -360.09,911.9 -374.09,916.7 "/>
+    <polygon style="fill: none; fill-opacity:0; stroke-width: 2; stroke: #000000" points="-388.09,911.9 -374.09,907.1 -360.09,911.9 -374.09,916.7 "/>
+    <text style="fill: #000000;text-anchor:start;font-size:12.7998;font-family:monospace;font-style:normal;font-weight:normal" x="-319.299" y="846.15"></text>
+    <text style="fill: #000000;text-anchor:start;font-size:12.7998;font-family:monospace;font-style:normal;font-weight:normal" x="-356.09" y="908.9"></text>
+    <text style="fill: #000000;text-anchor:end;font-size:12.7998;font-family:monospace;font-style:normal;font-weight:normal" x="-258.507" y="783.4"></text>
+  </g>
+  <g>
+    <polyline style="fill: none; fill-opacity:0; stroke-width: 2; stroke: #000000" points="374.989,965.066 6.03521,965.066 6.03521,911.9 -388.09,911.9 "/>
+    <polygon style="fill: #ffffff" points="400.161,965.066 386.161,969.866 372.161,965.066 386.161,960.266 "/>
+    <polygon style="fill: none; fill-opacity:0; stroke-width: 2; stroke: #000000" points="400.161,965.066 386.161,969.866 372.161,965.066 386.161,960.266 "/>
+    <text style="fill: #000000;text-anchor:start;font-size:12.7998;font-family:monospace;font-style:normal;font-weight:normal" x="8.03521" y="935.483"></text>
+    <text style="fill: #000000;text-anchor:end;font-size:12.7998;font-family:monospace;font-style:normal;font-weight:normal" x="368.161" y="962.066"></text>
+    <text style="fill: #000000;text-anchor:start;font-size:12.7998;font-family:monospace;font-style:normal;font-weight:normal" x="-384.09" y="908.9"></text>
+  </g>
+  <g>
+    <rect style="fill: #ffffff" x="-1643.2" y="873.7" width="318" height="56"/>
+    <rect style="fill: none; fill-opacity:0; stroke-width: 2; stroke: #000000" x="-1643.2" y="873.7" width="318" height="56"/>
+    <text style="fill: #000000;text-anchor:middle;font-size:16;font-family:sanserif;font-style:normal;font-weight:700" x="-1484.2" y="892.7">CSJnanaLive</text>
+    <text style="fill: #000000;text-anchor:middle;font-size:11.2;font-family:sanserif;font-style:italic;font-weight:normal" x="-1484.2" y="908.2">Entry point from Max/MSP patch into</text>
+    <text style="fill: #000000;text-anchor:middle;font-size:11.2;font-family:sanserif;font-style:italic;font-weight:normal" x="-1484.2" y="922.2">Jnana system for live input analysis.</text>
+    <rect style="fill: #ffffff" x="-1643.2" y="929.7" width="318" height="20"/>
+    <rect style="fill: none; fill-opacity:0; stroke-width: 2; stroke: #000000" x="-1643.2" y="929.7" width="318" height="20"/>
+    <text style="fill: #000000;text-anchor:start;font-size:12.8;font-family:monospace;font-style:normal;font-weight:normal" x="-1640.2" y="943.7">+inputAnalyzer: CS.Ableton.InputAnalyzer</text>
+    <rect style="fill: #ffffff" x="-1643.2" y="949.7" width="318" height="8"/>
+    <rect style="fill: none; fill-opacity:0; stroke-width: 2; stroke: #000000" x="-1643.2" y="949.7" width="318" height="8"/>
+  </g>
+  <g>
+    <polyline style="fill: none; fill-opacity:0; stroke-width: 2; stroke: #000000" points="-1299.02,915.7 -1249.85,915.7 -1249.85,918.5 -1175.51,918.5 "/>
+    <polygon style="fill: #ffffff" points="-1324.19,915.7 -1310.19,910.9 -1296.19,915.7 -1310.19,920.5 "/>
+    <polygon style="fill: none; fill-opacity:0; stroke-width: 2; stroke: #000000" points="-1324.19,915.7 -1310.19,910.9 -1296.19,915.7 -1310.19,920.5 "/>
+    <text style="fill: #000000;text-anchor:start;font-size:12.7998;font-family:monospace;font-style:normal;font-weight:normal" x="-1247.85" y="914.1"></text>
+    <text style="fill: #000000;text-anchor:start;font-size:12.7998;font-family:monospace;font-style:normal;font-weight:normal" x="-1292.19" y="912.7"></text>
+    <text style="fill: #000000;text-anchor:end;font-size:12.7998;font-family:monospace;font-style:normal;font-weight:normal" x="-1179.51" y="915.5"></text>
+  </g>
+  <g>
+    <polyline style="fill: none; fill-opacity:0; stroke-width: 2; stroke: #000000" points="-1013,382.4 -764.854,382.4 -764.854,911.9 -700.399,911.9 "/>
+    <polygon style="fill: #ffffff" points="-1038.17,382.4 -1024.17,377.6 -1010.17,382.4 -1024.17,387.2 "/>
+    <polygon style="fill: none; fill-opacity:0; stroke-width: 2; stroke: #000000" points="-1038.17,382.4 -1024.17,377.6 -1010.17,382.4 -1024.17,387.2 "/>
+    <text style="fill: #000000;text-anchor:start;font-size:12.7998;font-family:monospace;font-style:normal;font-weight:normal" x="-762.854" y="644.15"></text>
+    <text style="fill: #000000;text-anchor:start;font-size:12.7998;font-family:monospace;font-style:normal;font-weight:normal" x="-1006.17" y="379.4"></text>
+    <text style="fill: #000000;text-anchor:end;font-size:12.7998;font-family:monospace;font-style:normal;font-weight:normal" x="-704.399" y="908.9"></text>
+  </g>
+  <g>
+    <polyline style="fill: none; fill-opacity:0; stroke-width: 2; stroke: #000000" points="-1251.6,291.323 -1251.6,-31 -477,-31 -477,-38 "/>
+    <polygon style="fill: #ffffff" points="-1251.6,316.494 -1256.4,302.494 -1251.6,288.494 -1246.8,302.494 "/>
+    <polygon style="fill: none; fill-opacity:0; stroke-width: 2; stroke: #000000" points="-1251.6,316.494 -1256.4,302.494 -1251.6,288.494 -1246.8,302.494 "/>
+    <text style="fill: #000000;text-anchor:middle;font-size:12.7998;font-family:monospace;font-style:normal;font-weight:normal" x="-864.3" y="-34"></text>
+    <text style="fill: #000000;text-anchor:start;font-size:12.7998;font-family:monospace;font-style:normal;font-weight:normal" x="-1240.6" y="312.494"></text>
+    <text style="fill: #000000;text-anchor:start;font-size:12.7998;font-family:monospace;font-style:normal;font-weight:normal" x="-473" y="-26"></text>
+  </g>
+  <g>
+    <polyline style="fill: none; fill-opacity:0; stroke-width: 2; stroke: #000000" points="-1012.52,382.4 -772.768,382.4 -772.768,380.066 -507.843,380.066 "/>
+    <polygon style="fill: #ffffff" points="-1037.69,382.4 -1023.69,377.6 -1009.69,382.4 -1023.69,387.2 "/>
+    <polygon style="fill: none; fill-opacity:0; stroke-width: 2; stroke: #000000" points="-1037.69,382.4 -1023.69,377.6 -1009.69,382.4 -1023.69,387.2 "/>
+    <text style="fill: #000000;text-anchor:start;font-size:12.7998;font-family:monospace;font-style:normal;font-weight:normal" x="-770.768" y="378.233"></text>
+    <text style="fill: #000000;text-anchor:start;font-size:12.7998;font-family:monospace;font-style:normal;font-weight:normal" x="-1005.69" y="379.4"></text>
+    <text style="fill: #000000;text-anchor:end;font-size:12.7998;font-family:monospace;font-style:normal;font-weight:normal" x="-511.843" y="377.066"></text>
+  </g>
+  <g>
+    <polyline style="fill: none; fill-opacity:0; stroke-width: 2; stroke: #000000" points="-363.125,18.2434 -363.125,64.7006 -363.95,64.7006 -363.95,129.394 "/>
+    <polygon style="fill: #ffffff" points="-355.125,18.2434 -363.125,2.24339 -371.125,18.2434 "/>
+    <polygon style="fill: none; fill-opacity:0; stroke-width: 2; stroke: #000000" points="-355.125,18.2434 -363.125,2.24339 -371.125,18.2434 "/>
+  </g>
+</svg>
