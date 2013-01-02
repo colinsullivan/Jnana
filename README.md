@@ -26,7 +26,7 @@ make install
 
 Once the plug-ins are installed, an Ableton Live track must be configured correctly for the plug-ins to work.
 
-For information on installing and configuring on **OS X**, see the **setup guide**: [ccrma.stanford.edu/~colinsul/projects/jnana/osx-setup-guide/](osx-setup-guide).
+For information on installing and configuring on **OS X**, see the **setup guide**: [ccrma.stanford.edu/~colinsul/projects/jnana/osx-setup-guide/](http://ccrma.stanford.edu/~colinsul/projects/jnana/osx-setup-guide/).
 
 ## Developing
 
