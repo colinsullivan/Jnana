@@ -77,14 +77,27 @@
    **/
   this.trackWasAnalyzed = false;
 
+  /**
+   *  @type   Number
+   *  Length of markov chains to use in analysis.
+   **/
+  this.markovChainLength = null;
+
+
   this.status_message_out = function (msg) {
     outlet(0, ["set", msg]);
   };
 
-  this.init = function () {
+  this.init = function (initDoneCallback) {
+
+    if (typeof initDoneCallback === "undefined" || initDoneCallback === null) {
+      initDoneCallback = function () {
+        
+      };
+    }
 
     this.analyzer = new CS.PhraseAnalyzer({
-      markovOrder: 3
+      markovOrder: (this.markovChainLength || 3)
     });
 
     this.track = new LiveAPI("this_device canonical_parent");
@@ -99,6 +112,7 @@
 
     (new Task(function () {
       this.status_message_out("Jnana ready.");
+      initDoneCallback();
     }, this)).schedule(500);
 
   };
@@ -303,6 +317,23 @@
       for (i = 0; i < genClips.length; i++) {
         genClips[i]._phraseGenerator.set_use_circular(this.useCircularStatistics);
       }
+    }
+  };
+
+  /**
+   *  Set the length of the markov chains to use in analysis of phrases.
+   *
+   *  @param  Number  value  New markov chain length.
+   **/
+  this.set_markov_length = function (value) {
+    var me = this;
+    this.markovChainLength = Number(value);
+
+    if (this.initDone) {
+      this.status_message_out(
+        "Re-initializing with chain length " + this.markovChainLength + "..."
+      );
+      this.init();
     }
   };
 
