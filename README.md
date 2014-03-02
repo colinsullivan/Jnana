@@ -21,8 +21,21 @@ To install the plug-ins from the command-line:
 wget https://github.com/colinsullivan/Jnana/archive/v0.1.zip --no-check-certificate
 unzip v0.1.zip
 cd Jnana/
-make install
 ```
+
+then
+
+```bash
+make install-live8
+```
+
+or
+
+```bash
+make install-live9
+```
+
+depending on your version of Ableton.
 
 Once the plug-ins are installed, an Ableton Live track must be configured correctly for the plug-ins to work.
 
