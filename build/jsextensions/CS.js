@@ -9,31 +9,30 @@
  *              Licensed under the GPLv3 license.
  **/
 
+var helpers = require("CSHelpers");
+
 (function () {
   "use strict";
-
 
   var CS,
     post;
 
-  if (typeof require !== "undefined" && require !== null) {
-    post = console.log;
-  } else {
-    post = this.post;
-  }
+  // TODO: use a logger
+  //if (typeof require !== "undefined" && require !== null) {
+    //post = console.log;
+  //} else {
+    //post = this.post;
+  //}
   
   CS = this.CS = {
     DEBUG: true,
-    Ableton: {}
+    Ableton: {
+    },
+    helpers = helpers;
   };
   
-  CS.post = function (msg) {
-    if (CS.DEBUG) {
-      post(msg);
-    }
-  };
-
 }).call(this);
+exports = this;
 //     Underscore.js 1.4.2
 //     http://underscorejs.org
 //     (c) 2009-2012 Jeremy Ashkenas, DocumentCloud Inc.
@@ -1245,37 +1244,41 @@
  *              Licensed under the GPLv3 license.
  **/
 
-var print_object = function (obj) {
-  var key;
+var CS = require("CS");
 
-  for (key in obj) {
-    CS.post("obj[" + key + "]:\n");
-    CS.post(obj[key]);
-    CS.post("\n");   
-  }
-};
+exports = {
+  print_object: function (obj) {
+    var key;
 
-var error_aware_callback = function (cb) {
-  return function () {
-    try {
-      cb.apply(this, arguments);
-    } catch (err) {
-      post("\n--------\nERROR:\n--------\n");
-      post(err.fileName + ":" + err.lineNumber + "\n" + err.message);
+    for (key in obj) {
+      CS.post("obj[" + key + "]:\n");
+      CS.post(obj[key]);
+      CS.post("\n");   
     }
-  };
+  },
+
+  error_aware_callback: function (cb) {
+    return function () {
+      try {
+        cb.apply(this, arguments);
+      } catch (err) {
+        post("\n--------\nERROR:\n--------\n");
+        post(err.fileName + ":" + err.lineNumber + "\n" + err.message);
+      }
+    };
+  },
+
+  /**
+   *  Might return true, might return false.
+   **/
+  maybe: function () {
+    return (Math.random() <= 0.5);
+  },
+  post: function (msg) {
+    post(msg);
+  }
+
 };
-
-/**
- *  Might return true, might return false.
- **/
-var maybe = function () {
-  return (Math.random() <= 0.5);
-}
-
-if (typeof exports !== "undefined" && exports !== null) {
-  exports.maybe = maybe;
-}
 /**
  *  @file       CSPhraseNote.js
  *
@@ -1481,17 +1484,10 @@ if (typeof exports !== "undefined" && exports !== null) {
  *              Licensed under the GPLv3 license.
  **/
 
+var CS = require("CS");
+
 (function () {
   "use strict";
-
-  var CS;
-  if (typeof require !== "undefined" && require !== null) {
-    CS = require("./CS.js").CS;
-    require("./CSPhrase.js");
-    require("./CSPhraseNote.js");
-  } else {
-    CS = this.CS;
-  }
 
  /**
   *   @class  CS.Ableton.Clip  Parsing and instantiation of Ableton clip
@@ -1627,6 +1623,7 @@ if (typeof exports !== "undefined" && exports !== null) {
   };
 
 }).call(this);
+exports = this;
 /**
  *  @file       CSProbabilityVector.js
  *
@@ -1855,9 +1852,6 @@ if (typeof exports !== "undefined" && exports !== null) {
 
   if (typeof require !== "undefined" && require !== null) {
     CS = require("./CS.js").CS;
-    require("./CSMarkovTableRow.js");
-    require("./CSHelpers.js");
-    require("./CSProbabilityVector.js");
     root._ = require("./vendor/underscore.js")._;
   } else {
     CS = this.CS;
@@ -2069,8 +2063,7 @@ if (typeof exports !== "undefined" && exports !== null) {
   };
 
 }).call(this);
-
-
+module.exports = this;
 /**
  *  @file       CSMarkovStateMachine.js
  *
@@ -2334,8 +2327,8 @@ if (typeof exports !== "undefined" && exports !== null) {
     root = this;
   if (typeof require !== "undefined" && require !== null) {
     CS = require("./CS.js").CS;
-    require("./CSMarkovMultiStateMachine.js");
-    require("./CSMarkovTable.js");
+    CS.MarkovMultiStateMachine = require("./CSMarkovMultiStateMachine.js");
+    CS.MarkovTable = require("./CSMarkovTable.js");
     root._ = require("./vendor/underscore.js")._;
   } else {
     CS = this.CS;
@@ -2596,6 +2589,7 @@ if (typeof exports !== "undefined" && exports !== null) {
   };
 
 }).call(this);
+module.exports = this;
 /**
  *  @file       CSMarkovPhraseGenerator.js
  *
@@ -3223,7 +3217,7 @@ if (typeof exports !== "undefined" && exports !== null) {
   };
 
 }).call(this);
-
+module.exports = this;
 /**
  *  @file       CSInputAnalyzer.js
  *
@@ -3713,3 +3707,4 @@ if (typeof exports !== "undefined" && exports !== null) {
   
   
 }).call(this);
+exports = this;

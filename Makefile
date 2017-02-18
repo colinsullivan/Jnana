@@ -11,8 +11,10 @@
 ###
 #		These are the defaults on my OS X.  They are probably yours too.
 ###
+MAX7_JAVASCRIPT_DIR=~/Documents/Max\ 7/Library
 MAX6_JAVASCRIPT_DIR=/Applications/Max\ 6.1/Cycling\ \'74/jsextensions
 MAX5_JAVASCRIPT_DIR=/Applications/Max5/Cycling\ \'74/jsextensions
+MAX_JAVASCRIPT_DIR=${MAX7_JAVASCRIPT_DIR}
 ABLETON8_MAX_MIDI_EFFECT_DIR=~/Library/Application\ Support/Ableton/Library/Presets/MIDI\ Effects/Max\ MIDI\ Effect
 ABLETON9_MAX_MIDI_EFFECT_DIR=~/Music/Ableton/User\ Library/Presets/Midi\ Effects/Max\ Midi\ Effect
 
@@ -79,16 +81,16 @@ clean:
 	rm ${BUILD_MAX}/*
 
 install-live8:
-	cp ${BUILD_JSEXT}/CS.js ${MAX5_JAVASCRIPT_DIR}/
-	cp ${BUILD_JSEXT}/CSJnanaLive.js ${MAX5_JAVASCRIPT_DIR}/
-	cp ${BUILD_JSEXT}/CSJnanaClips.js ${MAX5_JAVASCRIPT_DIR}/
+	cp ${BUILD_JSEXT}/CS.js ${MAX_JAVASCRIPT_DIR}/
+	cp ${BUILD_JSEXT}/CSJnanaLive.js ${MAX_JAVASCRIPT_DIR}/
+	cp ${BUILD_JSEXT}/CSJnanaClips.js ${MAX_JAVASCRIPT_DIR}/
 	test -d ${ABLETON8_MAX_MIDI_EFFECT_DIR}/CS\ Devices/ || mkdir ${ABLETON8_MAX_MIDI_EFFECT_DIR}/CS\ Devices/
 	cp ${BUILD_MAX}/* ${ABLETON8_MAX_MIDI_EFFECT_DIR}/CS\ Devices/
 
 install-live9:
-	cp ${BUILD_JSEXT}/CS.js ${MAX6_JAVASCRIPT_DIR}/
-	cp ${BUILD_JSEXT}/CSJnanaLive.js ${MAX6_JAVASCRIPT_DIR}/
-	cp ${BUILD_JSEXT}/CSJnanaClips.js ${MAX6_JAVASCRIPT_DIR}/
+	cp ${BUILD_JSEXT}/CS.js ${MAX_JAVASCRIPT_DIR}/
+	cp ${BUILD_JSEXT}/CSJnanaLive.js ${MAX_JAVASCRIPT_DIR}/
+	cp ${BUILD_JSEXT}/CSJnanaClips.js ${MAX_JAVASCRIPT_DIR}/
 	test -d ${ABLETON9_MAX_MIDI_EFFECT_DIR}/CS\ Devices/ || mkdir ${ABLETON9_MAX_MIDI_EFFECT_DIR}/CS\ Devices/
 	cp ${BUILD_MAX}/* ${ABLETON9_MAX_MIDI_EFFECT_DIR}/CS\ Devices/
 

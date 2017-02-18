@@ -8,6 +8,11 @@
  **/
 
 /*global LiveAPI, CS, error_aware_callback, Task, outlet */
+var CS = require("CS");
+post("CS:\n");
+post(CS);
+post("\n");
+CS.helpers.print_object(CS);
 
 (function () {
   "use strict";
@@ -333,12 +338,8 @@
       this.status_message_out(
         "Re-initializing with chain length " + this.markovChainLength + "..."
       );
-      this.init(function () {
-        me.analyze_track();
-      });
+      this.init();
     }
   };
 
 }).call(this);
-
-

@@ -7,20 +7,18 @@
  *              Licensed under the GPLv3 license.
  **/
 
+var _ = require("underscore");
+
 (function () {
   "use strict";
 
-  var CS,
-    _,
-    root = this;
+  var CS;
   if (typeof require !== "undefined" && require !== null) {
-    CS = require("./CS.js").CS;
-    require("./CSMarkovMultiStateMachine.js");
-    require("./CSMarkovTable.js");
-    root._ = require("./vendor/underscore.js")._;
+    CS = require("CS");
+    CS.MarkovMultiStateMachine = require("CSMarkovMultiStateMachine");
+    CS.MarkovTable = require("CSMarkovTable");
   } else {
     CS = this.CS;
-    _ = this._;
   }
 
   /**
@@ -113,8 +111,7 @@
       circularDurationTable = this._circularDurationTable,
       circularVelocityTable = this._circularVelocityTable,
       i,
-      wrapIndex,
-      _ = root._;
+      wrapIndex;
 
     phraseNotes = phrase.get_notes();
 
@@ -277,3 +274,4 @@
   };
 
 }).call(this);
+module.exports = this.CS.PhraseAnalyzer;

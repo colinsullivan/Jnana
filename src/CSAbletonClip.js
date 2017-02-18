@@ -7,17 +7,10 @@
  *              Licensed under the GPLv3 license.
  **/
 
+var CS = require("CS");
+
 (function () {
   "use strict";
-
-  var CS;
-  if (typeof require !== "undefined" && require !== null) {
-    CS = require("./CS.js").CS;
-    require("./CSPhrase.js");
-    require("./CSPhraseNote.js");
-  } else {
-    CS = this.CS;
-  }
 
  /**
   *   @class  CS.Ableton.Clip  Parsing and instantiation of Ableton clip
@@ -153,3 +146,4 @@
   };
 
 }).call(this);
+exports = this;

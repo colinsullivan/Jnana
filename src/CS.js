@@ -9,28 +9,11 @@
  *              Licensed under the GPLv3 license.
  **/
 
-(function () {
-  "use strict";
-
-
-  var CS,
-    post;
-
-  if (typeof require !== "undefined" && require !== null) {
-    post = console.log;
-  } else {
-    post = this.post;
-  }
-  
-  CS = this.CS = {
+exports = {
+  CS: {
     DEBUG: true,
-    Ableton: {}
-  };
-  
-  CS.post = function (msg) {
-    if (CS.DEBUG) {
-      post(msg);
-    }
-  };
-
-}).call(this);
+    Ableton: {
+    },
+    helpers: require("CSHelpers"),
+  }
+};

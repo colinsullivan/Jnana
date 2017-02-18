@@ -14,9 +14,6 @@
 
   if (typeof require !== "undefined" && require !== null) {
     CS = require("./CS.js").CS;
-    require("./CSMarkovTableRow.js");
-    require("./CSHelpers.js");
-    require("./CSProbabilityVector.js");
     root._ = require("./vendor/underscore.js")._;
   } else {
     CS = this.CS;
@@ -228,5 +225,4 @@
   };
 
 }).call(this);
-
-
+module.exports = this;

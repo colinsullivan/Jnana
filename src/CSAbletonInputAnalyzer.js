@@ -301,3 +301,4 @@
   
   
 }).call(this);
+exports = this;

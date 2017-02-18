@@ -1,0 +1,36 @@
+{
+  "name": "jnana",
+  "version": "0.2.0",
+  "description": "a generative musical accompaniment system integrated into Ableton Live",
+  "directories": {
+    "doc": "docs",
+    "test": "tests"
+  },
+  "scripts": {
+    "test": "mocha ./tests/*.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/colinsullivan/Jnana.git"
+  },
+  "author": "Colin Sullivan <colin@colin-sullivan.net>",
+  "license": "GPL-3.0",
+  "bugs": {
+    "url": "https://github.com/colinsullivan/Jnana/issues"
+  },
+  "homepage": "https://github.com/colinsullivan/Jnana#readme",
+	"eslintConfig": {
+    "extends": "eslint:recommended",
+			"env": {
+					"commonjs": true
+			},
+      "block-scoped-var": true,
+      "globals": {
+        "post": true
+      }
+	},
+  "devDependencies": {
+    "eslint": "^3.15.0",
+    "eslint-config-google": "^0.7.1"
+  }
+}
